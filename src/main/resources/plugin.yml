@@ -1,0 +1,13 @@
+name: Hub Extended
+version: 1.0
+main: me.streafe.HubExtended.HubExtended
+author: Streafe
+
+commands:
+  connect:
+    usage: /<command>
+    default: true
+
+  friend:
+    aliases: [f]
+    default: true
