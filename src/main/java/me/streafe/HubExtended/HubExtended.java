@@ -1,5 +1,6 @@
 package me.streafe.HubExtended;
 
+import me.streafe.HubExtended.bungee.BungeeMessageListener;
 import me.streafe.HubExtended.sql.SQL_Class;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -20,9 +21,14 @@ public class HubExtended extends JavaPlugin {
         this.pw = getConfig().get("sql.password").toString();
         this.dbn = getConfig().get("sql.databasename").toString();
         this.port = getConfig().getInt("sql.port");
+
+        this.getServer().getMessenger().registerOutgoingPluginChannel(this,"BungeeCord");
+        this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeMessageListener());
     }
 
     public static HubExtended getInstance(){
         return instance;
     }
+
+
 }
