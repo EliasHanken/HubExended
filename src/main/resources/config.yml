@@ -1,0 +1,9 @@
+sql:
+  host: 'localhost'
+  port: '3306'
+  password: ''
+  database: 'HubExtended'
+  username: 'root'
+system:
+  chatFormat: ''
+

@@ -7,7 +7,10 @@ commands:
   connect:
     usage: /<command>
     default: true
-
   friend:
     aliases: [f]
+    default: true
+  msg:
+    aliases: [r, m]
+    description: Send a message across servers
     default: true
