@@ -1,5 +1,6 @@
 package me.streafe.HubExtended.utils;
 
+import me.streafe.HubExtended.HubExtended;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
 import org.bukkit.ChatColor;
@@ -37,5 +38,9 @@ public class Utils {
         item.setItemMeta(meta);
 
         return item;
+    }
+
+    public String getPluginPrefix(){
+        return translate(HubExtended.getInstance().getConfig().getString("system.plugin_prefix"));
     }
 }
