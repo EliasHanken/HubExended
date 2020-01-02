@@ -3,13 +3,19 @@ package me.streafe.HubExtended.minigames;
 import me.streafe.HubExtended.HubExtended;
 import me.streafe.HubExtended.player_utils.HubPlayer;
 import me.streafe.HubExtended.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 
 public class MinigameCommand implements CommandExecutor {
     Utils utils = new Utils();
+
+
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String s, String args[]) {
         if(sender instanceof Player) {
@@ -60,6 +66,8 @@ public class MinigameCommand implements CommandExecutor {
 
                 } else if(args.length == 1 && args[0].equalsIgnoreCase("list")){
                     hubPlayer.sendMessage(utils.getPluginPrefix() + "Your game id is: " + hubPlayer.getGameID());
+                    hubPlayer.sendMessage("Gametype: " + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getType().toString());
+                    hubPlayer.sendMessage("started: " + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).isStarted());
                     hubPlayer.sendMessage(utils.translate("&7List:"));
                     hubPlayer.sendMessage(utils.translate("&7") + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getPlayerListString());
                 }
@@ -67,11 +75,70 @@ public class MinigameCommand implements CommandExecutor {
                     if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getOwner() == player){
                         HubExtended.getInstance().minigameHashMap.remove(hubPlayer.getGameID());
                     }
+                    HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerList.remove(hubPlayer);
+                    HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerAmount--;
                     hubPlayer.inGame = false;
                     hubPlayer.setGameID("");
-                    hubPlayer.inGame = false;
                     hubPlayer.sendMessage(utils.getPluginPrefix() + "You left the gameparty");
 
+
+                }
+
+                else if(args.length == 1 && args[0].equalsIgnoreCase("start")){
+                    if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getOwner() == player){
+                        if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerAmount < 2){
+                            player.sendMessage(utils.translate("&cYou are less than 2 players in the party!"));
+                            player.sendMessage(utils.translate("&cWant to start it anyway? Do /minigames startanyway"));
+                            return true;
+                        }
+                        HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).setStarted(true);
+                        for(HubPlayer players : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getPlayerList()){
+                            players.sendMessage(utils.translate("&aGame starting in: "));
+                            player.sendMessage("");
+
+                            BukkitScheduler scheduler = HubExtended.getInstance().getServer().getScheduler();
+                            scheduler.scheduleSyncRepeatingTask(HubExtended.getInstance(), new Runnable() {
+                                int i = 10;
+                                @Override
+                                public void run() {
+                                    if(i <= 0){
+                                        scheduler.cancelAllTasks();
+                                        HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).startGame();
+                                        return;
+                                    }
+                                    players.sendMessage(utils.translate("&a") + i);
+                                    i--;
+
+                                }
+                            },0L, 20L);
+                        }
+                    }
+                }
+
+                else if(args.length == 1 && args[0].equalsIgnoreCase("startanyway")){
+                    if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getOwner() == player){
+                        HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).setStarted(true);
+                        for(HubPlayer players : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getPlayerList()){
+                            players.sendMessage(utils.translate("&aGame starting in: "));
+                            player.sendMessage("");
+
+                            BukkitScheduler scheduler = HubExtended.getInstance().getServer().getScheduler();
+                            scheduler.scheduleSyncRepeatingTask(HubExtended.getInstance(), new Runnable() {
+                                int i = 10;
+                                @Override
+                                public void run() {
+                                    if(i <= 0){
+                                        scheduler.cancelAllTasks();
+                                        HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).startGame();
+                                        return;
+                                    }
+                                    players.sendMessage(utils.translate("&a") + i);
+                                    i--;
+
+                                }
+                            },0L, 20L);
+                        }
+                    }
                 }
 
                 else {

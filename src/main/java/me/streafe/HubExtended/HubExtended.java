@@ -30,6 +30,8 @@ public class HubExtended extends JavaPlugin {
         saveConfig();
         getCommand("connect").setExecutor(new BungeeConnect());
         getCommand("msg").setExecutor(new BungeeMessage());
+        getCommand("hub").setExecutor(new BungeeConnect());
+        getCommand("sethub").setExecutor(new BungeeConnect());
 
         this.host = getConfig().get("sql.host").toString();
         this.usr = getConfig().get("sql.username").toString();
@@ -44,6 +46,7 @@ public class HubExtended extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new JoinListener(), this);
 
         getCommand("minigames").setExecutor(new MinigameCommand());
+
 
         this.minigameHashMap = new HashMap<>();
         this.hubPlayerList = new HashMap<>();

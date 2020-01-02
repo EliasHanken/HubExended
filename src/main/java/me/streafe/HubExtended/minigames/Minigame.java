@@ -1,7 +1,9 @@
 package me.streafe.HubExtended.minigames;
 
+import me.streafe.HubExtended.HubExtended;
 import me.streafe.HubExtended.player_utils.HubPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
@@ -17,6 +19,8 @@ public class Minigame implements Listener {
     private Player owner;
     private MinigameType type;
     private boolean started = false;
+    private Location spawnLoc;
+    public int playerAmount;
 
 
     public Minigame(int maxPlayers, MinigameType type){
@@ -26,8 +30,19 @@ public class Minigame implements Listener {
         this.setMaxPlayers(maxPlayers);
     }
 
+    public void startGame(){
+        for(HubPlayer players : playerList){
+            players.sendMessage("Game started!");
+        }
+    }
+
     public void addNewPlayer(Player player){
         this.getPlayerList().add(new HubPlayer(player));
+        playerAmount++;
+    }
+
+    public void removePlayer(Player player){
+        this.getPlayerList().remove(new HubPlayer(player));
     }
 
     public void setType(MinigameType type){
@@ -104,4 +119,5 @@ public class Minigame implements Listener {
     public void setStarted(boolean started) {
         this.started = started;
     }
+
 }

@@ -17,3 +17,7 @@ commands:
   minigames:
     default: true
     usage: /<command>
+  hub:
+    default: true
+  sethub:
+    default: op
