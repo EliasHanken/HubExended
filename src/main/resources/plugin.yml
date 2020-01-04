@@ -21,3 +21,5 @@ commands:
     default: true
   sethub:
     default: op
+  settings:
+    default: true

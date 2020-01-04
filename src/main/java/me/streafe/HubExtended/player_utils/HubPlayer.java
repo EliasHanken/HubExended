@@ -11,10 +11,13 @@ public class HubPlayer {
     private Player player;
     public boolean inGame = false;
     private String gameID;
+    public boolean signEditEnable = false;
+    public boolean superVanish = false;
 
     public HubPlayer(Player player){
         this.player = player;
     }
+
 
     public boolean inGame(HubPlayer hubPlayer){
         if(this.inGame){
@@ -25,6 +28,10 @@ public class HubPlayer {
 
     public void sendMessage(String message){
         this.player.sendMessage(message);
+    }
+
+    public void setSignEditEnable(boolean bool){
+        this.signEditEnable = bool;
     }
 
     public boolean isOwnerOfGame(){

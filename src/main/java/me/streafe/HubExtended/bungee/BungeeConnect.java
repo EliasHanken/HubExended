@@ -51,10 +51,12 @@ public class BungeeConnect implements CommandExecutor {
                             new BukkitRunnable() {
                                 @Override
                                 public void run() {
-                                    int x = HubExtended.getInstance().getConfig().getInt("world.hubX");
-                                    int y = HubExtended.getInstance().getConfig().getInt("world.hubY");
-                                    int z = HubExtended.getInstance().getConfig().getInt("world.hubZ");
-                                    Location hubLoc = new Location(Bukkit.getWorld("world"),x,y,z);
+                                    double x = HubExtended.getInstance().getConfig().getDouble("world.hubX");
+                                    double y = HubExtended.getInstance().getConfig().getDouble("world.hubY");
+                                    double z = HubExtended.getInstance().getConfig().getDouble("world.hubZ");
+                                    float pitch = (float) HubExtended.getInstance().getConfig().get("world.hubPitch");
+                                    float yaw = (float) HubExtended.getInstance().getConfig().get("world.hubYaw");
+                                    Location hubLoc = new Location(Bukkit.getWorld("world"),x,y,z,yaw,pitch);
                                     player.teleport(hubLoc);
                                 }
                             }.runTaskLaterAsynchronously(HubExtended.getInstance(),40L);
@@ -71,20 +73,25 @@ public class BungeeConnect implements CommandExecutor {
 
             else if(c.getName().equalsIgnoreCase("sethub")) {
 
-                int x = player.getLocation().getBlockX();
-                int y = player.getLocation().getBlockY();
-                int z = player.getLocation().getBlockZ();
+                double x = player.getLocation().getX();
+                double y = player.getLocation().getY();
+                double z = player.getLocation().getZ();
+                float pitch = player.getLocation().getPitch();
+                float yaw = player.getLocation().getYaw();
 
                 try{
                     HubExtended.getInstance().getConfig().set("world.hubX",x);
                     HubExtended.getInstance().getConfig().set("world.hubY",y);
                     HubExtended.getInstance().getConfig().set("world.hubZ",z);
+                    HubExtended.getInstance().getConfig().set("world.hubYaw",yaw);
+                    HubExtended.getInstance().getConfig().set("world.hubPitch",pitch);
                     HubExtended.getInstance().saveConfig();
                 }catch (Exception e){
                     e.printStackTrace();
                 }
 
-                player.sendMessage(utils.translate("&aHub set to " + x + ", " + y + ", " + z ));
+                player.sendMessage(utils.translate("&7Hub set to &a" + x + "&7, &a" + y + "&7, &a" + z ));
+                player.sendMessage(utils.translate("&7Pitch: &a" + pitch + " &7Yaw: &7" + yaw));
             }
 
 
