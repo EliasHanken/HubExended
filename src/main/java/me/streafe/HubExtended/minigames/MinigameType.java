@@ -2,8 +2,8 @@ package me.streafe.HubExtended.minigames;
 
 public enum MinigameType {
 
-    ARROW("arrow"),
-    BARBARIAN("barbarian");
+    ARROW("ARROW"),
+    BARBARIAN("BARBARIAN");
 
     private String name;
 
@@ -15,13 +15,6 @@ public enum MinigameType {
         return this.name;
     }
 
-    public static MinigameType fromString(String text){
-        for(MinigameType types: MinigameType.values()){
-            if(types.name.equalsIgnoreCase(text)){
-                return types;
-            }
-        }
-        return null;
-    }
+
 
 }

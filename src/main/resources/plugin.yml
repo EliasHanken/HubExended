@@ -26,3 +26,7 @@ commands:
   luckychest:
     default: true
     aliases: [lc, openchest]
+  stats:
+    default: true
+  help:
+    default: true

@@ -4,6 +4,8 @@ import me.streafe.HubExtended.HubExtended;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class HubPlayer {
@@ -16,9 +18,12 @@ public class HubPlayer {
     public int tokens;
     public boolean isOnCooldown = false;
     public RankEnum rank = RankEnum.MEMBER;
+    public List<String> friends;
+    public int wins;
 
     public HubPlayer(Player player){
         this.player = player;
+        friends = new ArrayList<>();
     }
 
 

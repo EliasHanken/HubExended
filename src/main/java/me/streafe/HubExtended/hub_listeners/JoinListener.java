@@ -10,6 +10,10 @@ import me.streafe.HubExtended.utils.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class JoinListener implements Listener {
@@ -50,4 +54,31 @@ public class JoinListener implements Listener {
             }
         }
     }
+
+    @EventHandler
+    public void onPlayerHurt(EntityDamageEvent e){
+
+        if(e.getEntity() instanceof Player){
+            Player p = (Player) e.getEntity();
+
+            if(e.getCause() == EntityDamageEvent.DamageCause.FALL){
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerHurt(EntityDamageByEntityEvent e){
+
+        if(e.getEntity() instanceof Player){
+            Player p = (Player) e.getEntity();
+
+            if(e.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK){
+                e.getDamager().sendMessage(utils.translate("&c(!) &7No pvp here"));
+                e.setCancelled(true);
+            }
+        }
+    }
+
+
 }

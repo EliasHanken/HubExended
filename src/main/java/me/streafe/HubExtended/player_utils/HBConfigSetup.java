@@ -7,6 +7,9 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 
 public class HBConfigSetup {
 
@@ -28,10 +31,41 @@ public class HBConfigSetup {
         }
         playerFile = new File(HubExtended.getInstance().getDataFolder() +"/PlayerFolder/"+ player.getUniqueId().toString());
 
+        /*
         if(!playerFile.exists()){
+            Date joinDate = new Date();
+            YamlConfiguration yaml = YamlConfiguration.loadConfiguration(playerFile);
+            yaml.set("player.name", player.getName());
+            yaml.set("player.tokens",3);
+            yaml.set("player.joinDate",joinDate.toString());
+            yaml.set("player.friends", Arrays.asList("Streafe", "atob"));
+            yaml.set("player.wins",0);
+            if(!player.getName().equalsIgnoreCase("Streafe")){
+                yaml.set("player.rank","MEMBER");
+            }else{
+                yaml.set("player.rank","OWNER");
+            }
+
+            yaml.options().copyDefaults(true);
+            try {
+                yaml.save(playerFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+         */
+
+
+        if(!playerFile.exists()){
+            String joinDate = new SimpleDateFormat("dd-MM-yyyy").format(System.currentTimeMillis());
             YamlConfiguration yaml = YamlConfiguration.loadConfiguration(playerFile);
             yaml.set("player.name",player.getName());
             yaml.set("player.tokens",hubPlayer.tokens);
+            yaml.set("player.tokens",3);
+            yaml.set("player.joinDate",joinDate);
+            yaml.set("player.friends", Arrays.asList("Streafe", "atob"));
+            yaml.set("player.wins",0);
             if(hubPlayer.rank == RankEnum.MEMBER){
                 yaml.set("player.rank","MEMBER");
             }else if(hubPlayer.rank == RankEnum.MODERATOR){
@@ -53,6 +87,8 @@ public class HBConfigSetup {
             YamlConfiguration yaml = YamlConfiguration.loadConfiguration(playerFile);
             yaml.set("player.name",player.getName());
             hubPlayer.tokens = yaml.getInt("player.tokens");
+            hubPlayer.friends = Arrays.asList(yaml.getString("player.friends"));
+            hubPlayer.wins = yaml.getInt("player.wins");
             if(yaml.get("player.rank").equals("MEMBER")){
                 hubPlayer.setRank(RankEnum.MEMBER);
             }else if(yaml.get("player.rank").equals("MODERATOR")){
@@ -71,6 +107,8 @@ public class HBConfigSetup {
                 e.printStackTrace();
             }
         }
+
+
     }
 
     public void editString(String string,int value){

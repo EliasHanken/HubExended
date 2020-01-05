@@ -21,6 +21,7 @@ public class Minigame implements Listener {
     private boolean started = false;
     private Location spawnLoc;
     public int playerAmount;
+    public MinigameType minigameType;
 
 
     public Minigame(int maxPlayers, MinigameType type){
