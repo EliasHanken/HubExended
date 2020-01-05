@@ -54,8 +54,8 @@ public class BungeeConnect implements CommandExecutor {
                                     double x = HubExtended.getInstance().getConfig().getDouble("world.hubX");
                                     double y = HubExtended.getInstance().getConfig().getDouble("world.hubY");
                                     double z = HubExtended.getInstance().getConfig().getDouble("world.hubZ");
-                                    float pitch = (float) HubExtended.getInstance().getConfig().get("world.hubPitch");
-                                    float yaw = (float) HubExtended.getInstance().getConfig().get("world.hubYaw");
+                                    float pitch = (float) HubExtended.getInstance().getConfig().getDouble("world.hubPitch");
+                                    float yaw = (float) HubExtended.getInstance().getConfig().getDouble("world.hubYaw");
                                     Location hubLoc = new Location(Bukkit.getWorld("world"),x,y,z,yaw,pitch);
                                     player.teleport(hubLoc);
                                 }

@@ -23,3 +23,6 @@ commands:
     default: op
   settings:
     default: true
+  luckychest:
+    default: true
+    aliases: [lc, openchest]

@@ -33,7 +33,6 @@ public class Minigame implements Listener {
     public void startGame(){
         for(HubPlayer players : playerList){
             players.sendMessage("Game started!");
-
         }
     }
 

@@ -13,6 +13,9 @@ public class HubPlayer {
     private String gameID;
     public boolean signEditEnable = false;
     public boolean superVanish = false;
+    public int tokens;
+    public boolean isOnCooldown = false;
+    public RankEnum rank = RankEnum.MEMBER;
 
     public HubPlayer(Player player){
         this.player = player;
@@ -26,12 +29,24 @@ public class HubPlayer {
         return false;
     }
 
+    public void setRank(RankEnum rank){
+        this.rank = rank;
+    }
+
     public void sendMessage(String message){
         this.player.sendMessage(message);
     }
 
     public void setSignEditEnable(boolean bool){
         this.signEditEnable = bool;
+    }
+
+    public int getTokens(){
+        return this.tokens;
+    }
+
+    public void addTokens(int tokens){
+        this.tokens+=tokens;
     }
 
     public boolean isOwnerOfGame(){

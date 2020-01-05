@@ -15,6 +15,8 @@ import org.bukkit.scheduler.BukkitTask;
 public class MinigameCommand implements CommandExecutor {
     Utils utils = new Utils();
 
+    private int taskid;
+
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String s, String args[]) {
@@ -64,6 +66,12 @@ public class MinigameCommand implements CommandExecutor {
                     hubPlayer.setGameID(args[1]);
                     hubPlayer.sendMessage("Your game id is: " + hubPlayer.getGameID());
 
+                    for(HubPlayer partyPlayers : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerList){
+                        if(!(partyPlayers.getName() == hubPlayer.getName())){
+                            partyPlayers.sendMessage(utils.translate("&7" + hubPlayer.getName() + " &cleft the party"));
+                        }
+                    }
+
                 } else if(args.length == 1 && args[0].equalsIgnoreCase("list")){
                     hubPlayer.sendMessage(utils.getPluginPrefix() + "Your game id is: " + hubPlayer.getGameID());
                     hubPlayer.sendMessage("Gametype: " + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getType().toString());
@@ -74,6 +82,12 @@ public class MinigameCommand implements CommandExecutor {
                 else if(args.length == 1 && args[0].equalsIgnoreCase("leave")){
                     if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getOwner() == player){
                         HubExtended.getInstance().minigameHashMap.remove(hubPlayer.getGameID());
+                    }
+
+                    for(HubPlayer partyPlayers : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerList){
+                        if(!(partyPlayers.getName() == hubPlayer.getName())){
+                            partyPlayers.sendMessage(utils.translate("&7" + hubPlayer.getName() + " &cleft the party"));
+                        }
                     }
                     HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerList.remove(hubPlayer);
                     HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerAmount--;
@@ -96,15 +110,18 @@ public class MinigameCommand implements CommandExecutor {
                             players.sendMessage(utils.translate("&aGame starting in: "));
                             player.sendMessage("");
 
-                            BukkitScheduler scheduler = HubExtended.getInstance().getServer().getScheduler();
-                            scheduler.scheduleSyncRepeatingTask(HubExtended.getInstance(), new Runnable() {
+                            this.taskid = HubExtended.getInstance().getServer().getScheduler().scheduleSyncRepeatingTask(HubExtended.getInstance(), new Runnable() {
                                 int i = 10;
                                 @Override
                                 public void run() {
                                     if(i <= 0){
-                                        scheduler.cancelAllTasks();
                                         HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).startGame();
+                                        Bukkit.getScheduler().cancelTask(taskid);
                                         return;
+                                    }
+                                    if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerAmount<2){
+                                        hubPlayer.sendMessage(utils.translate("&cSomeone left your lobby"));
+                                        Bukkit.getScheduler().cancelTask(taskid);
                                     }
                                     players.sendMessage(utils.translate("&a") + i);
                                     i--;
@@ -122,15 +139,18 @@ public class MinigameCommand implements CommandExecutor {
                             players.sendMessage(utils.translate("&aGame starting in: "));
                             player.sendMessage("");
 
-                            BukkitScheduler scheduler = HubExtended.getInstance().getServer().getScheduler();
-                            scheduler.scheduleSyncRepeatingTask(HubExtended.getInstance(), new Runnable() {
+                            this.taskid = HubExtended.getInstance().getServer().getScheduler().scheduleSyncRepeatingTask(HubExtended.getInstance(), new Runnable() {
                                 int i = 10;
                                 @Override
                                 public void run() {
                                     if(i <= 0){
-                                        scheduler.cancelAllTasks();
                                         HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).startGame();
+                                        Bukkit.getScheduler().cancelTask(taskid);
                                         return;
+                                    }
+                                    if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerAmount<2){
+                                        hubPlayer.sendMessage(utils.translate("&cSomeone left your lobby"));
+                                        Bukkit.getScheduler().cancelTask(taskid);
                                     }
                                     players.sendMessage(utils.translate("&a") + i);
                                     i--;

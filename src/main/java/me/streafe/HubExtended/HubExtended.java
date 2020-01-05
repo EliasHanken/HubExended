@@ -1,19 +1,19 @@
 package me.streafe.HubExtended;
 
-import com.avaje.ebean.RawSql;
 import me.streafe.HubExtended.bungee.BungeeConnect;
 import me.streafe.HubExtended.bungee.BungeeMessage;
 import me.streafe.HubExtended.bungee.BungeeMessageListener;
+import me.streafe.HubExtended.hub_commands.lucky_chest_command;
 import me.streafe.HubExtended.hub_commands.menu_command;
+import me.streafe.HubExtended.hub_listeners.BlockListener;
+import me.streafe.HubExtended.hub_listeners.RespawnListener;
 import me.streafe.HubExtended.hub_listeners.JoinListener;
 import me.streafe.HubExtended.minigames.Minigame;
 import me.streafe.HubExtended.minigames.MinigameCommand;
 import me.streafe.HubExtended.player_utils.HubPlayer;
 import me.streafe.HubExtended.sql.SQL_Class;
 import me.streafe.HubExtended.utils.CustomSign;
-import me.streafe.HubExtended.utils.Menu;
 import me.streafe.HubExtended.utils.MenuListener;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.SQLException;
@@ -52,9 +52,13 @@ public class HubExtended extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new JoinListener(), this);
         getServer().getPluginManager().registerEvents(new CustomSign(),this);
         getServer().getPluginManager().registerEvents(new MenuListener(),this);
+        getServer().getPluginManager().registerEvents(new RespawnListener(),this);
+        getServer().getPluginManager().registerEvents(new BlockListener(),this);
 
         getCommand("minigames").setExecutor(new MinigameCommand());
         getCommand("settings").setExecutor(new menu_command());
+        getCommand("luckychest").setExecutor(new lucky_chest_command());
+
 
 
         this.minigameHashMap = new HashMap<>();
