@@ -74,6 +74,8 @@ public class HBConfigSetup {
                 yaml.set("player.rank","CO_OWNER");
             }else if(hubPlayer.rank == RankEnum.OWNER){
                 yaml.set("player.rank","OWNER");
+            }else if(hubPlayer.rank == RankEnum.DEVELOPER){
+                yaml.set("player.rank","DEVELOPER");
             }
             yaml.options().copyDefaults(true);
             try {
@@ -99,6 +101,8 @@ public class HBConfigSetup {
                 hubPlayer.setRank(RankEnum.CO_OWNER);
             } else if(yaml.get("player.rank").equals("OWNER")){
                 hubPlayer.setRank(RankEnum.OWNER);
+            }else if(hubPlayer.rank == RankEnum.DEVELOPER){
+                yaml.set("player.rank","DEVELOPER");
             }
             yaml.options().copyDefaults(true);
             try {

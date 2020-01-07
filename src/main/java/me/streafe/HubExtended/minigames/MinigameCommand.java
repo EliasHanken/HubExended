@@ -16,6 +16,7 @@ public class MinigameCommand implements CommandExecutor {
     Utils utils = new Utils();
 
     private int taskid;
+    private MinigameType minigameType;
 
 
     @Override
@@ -32,7 +33,13 @@ public class MinigameCommand implements CommandExecutor {
                         hubPlayer.sendMessage(utils.getPluginPrefix() + utils.translate("&cYou are already a owner of a game!"));
                         return true;
                     }
-                    minigame = new Minigame(Integer.parseInt(args[2]), MinigameType.ARROW);
+                    try{
+                        this.minigameType = MinigameType.valueOf(args[1].toUpperCase());
+                    }catch (Exception e){
+                        player.sendMessage(utils.translate("&c(!) &7That is not an gamemode"));
+                        return true;
+                    }
+                    minigame = new Minigame(Integer.parseInt(args[2]), this.minigameType);
                     hubPlayer.sendMessage(utils.getPluginPrefix() + "Game ID: " + utils.translate("&d&l"+minigame.getGameID()) + utils.translate("&7")+ " (share with friends)");
                     minigame.addNewPlayer(player);
                     hubPlayer.inGame = true;
@@ -43,6 +50,7 @@ public class MinigameCommand implements CommandExecutor {
 
                     hubPlayer.sendMessage(utils.translate("&7Max players: ") + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getMaxPlayers());
                     hubPlayer.sendMessage(utils.translate("&7Is started: ") + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).isStarted());
+
                 } else if (args.length == 1 && args[0].equalsIgnoreCase("delete")) {
                     if (HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getOwner() == player) {
                         HubExtended.getInstance().minigameHashMap.remove(hubPlayer.getGameID());
@@ -52,7 +60,17 @@ public class MinigameCommand implements CommandExecutor {
                     } else {
                         hubPlayer.sendMessage(utils.getPluginPrefix() + "You are not a current owner of a game");
                     }
-                } else if (args.length == 2 && args[0].equalsIgnoreCase("join")) {
+                } else if(args.length == 2 && args[0].equalsIgnoreCase("settype")){
+                    try{
+                        this.minigameType = MinigameType.valueOf(args[1]);
+                        HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).setType(this.minigameType);
+                        player.sendMessage(utils.translate("&aGame type set to " + this.minigameType.getName()));
+                    }catch (Exception e){
+                        player.sendMessage(utils.translate("&c(!) &7That is not an gamemode"));
+                    }
+                }
+
+                else if (args.length == 2 && args[0].equalsIgnoreCase("join")) {
                     if(HubExtended.getInstance().getMinigameByID(args[1]).playerList.contains(hubPlayer)){
                         hubPlayer.sendMessage(utils.getPluginPrefix() + "&cYou are already in this game");
                         return true;
@@ -65,10 +83,11 @@ public class MinigameCommand implements CommandExecutor {
                     player.sendMessage(utils.getPluginPrefix() + "you joined the game with ID: " + HubExtended.getInstance().getMinigameByID(args[1]).getGameID());
                     hubPlayer.setGameID(args[1]);
                     hubPlayer.sendMessage("Your game id is: " + hubPlayer.getGameID());
+                    hubPlayer.inGame = true;
 
                     for(HubPlayer partyPlayers : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerList){
-                        if(!(partyPlayers.getName() == hubPlayer.getName())){
-                            partyPlayers.sendMessage(utils.translate("&7" + hubPlayer.getName() + " &cleft the party"));
+                        if(!(partyPlayers.getName().equalsIgnoreCase(hubPlayer.getName()))){
+                            partyPlayers.sendMessage(utils.translate("&7" + hubPlayer.getName() + " &ajoined the party"));
                         }
                     }
 
@@ -81,20 +100,33 @@ public class MinigameCommand implements CommandExecutor {
                 }
                 else if(args.length == 1 && args[0].equalsIgnoreCase("leave")){
                     if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getOwner() == player){
-                        HubExtended.getInstance().minigameHashMap.remove(hubPlayer.getGameID());
-                    }
-
-                    for(HubPlayer partyPlayers : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerList){
-                        if(!(partyPlayers.getName() == hubPlayer.getName())){
+                        for(HubPlayer partyPlayers : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerList){
                             partyPlayers.sendMessage(utils.translate("&7" + hubPlayer.getName() + " &cleft the party"));
-                        }
-                    }
-                    HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerList.remove(hubPlayer);
-                    HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerAmount--;
-                    hubPlayer.inGame = false;
-                    hubPlayer.setGameID("");
-                    hubPlayer.sendMessage(utils.getPluginPrefix() + "You left the gameparty");
+                            partyPlayers.inGame = false;
 
+                            HubExtended.getInstance().minigameHashMap.remove(hubPlayer.getGameID());
+
+                            partyPlayers.setGameID("");
+                            partyPlayers.sendMessage(utils.getPluginPrefix() + "You left the gameparty");
+
+                        }
+                        hubPlayer.inGame = false;
+                        hubPlayer.setGameID("");
+                        hubPlayer.sendMessage(utils.getPluginPrefix() + "You left the gameparty and deleted it");
+
+                    }else{
+                        for(HubPlayer partyPlayers : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getPlayerList()){
+                            if(!(partyPlayers.getName().equalsIgnoreCase(hubPlayer.getName()))){
+                                partyPlayers.sendMessage(utils.translate("&7" + hubPlayer.getName() + " &cleft the party"));
+                            }
+                        }
+                        HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).removePlayer(player);
+                        HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerAmount--;
+                        hubPlayer.inGame = false;
+                        hubPlayer.setGameID("");
+
+                        hubPlayer.sendMessage(utils.getPluginPrefix() + "You left the gameparty");
+                    }
 
                 }
 
@@ -162,7 +194,7 @@ public class MinigameCommand implements CommandExecutor {
                 }
 
                 else {
-                    hubPlayer.sendMessage("§c/minigame [create] [type] [max players]");
+                    hubPlayer.sendMessage("§c/minigame help");
                 }
             }
         }

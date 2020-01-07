@@ -29,6 +29,7 @@ public class Minigame implements Listener {
         this.setPlayerList(new ArrayList<>());
         this.setType(type);
         this.setMaxPlayers(maxPlayers);
+        this.minigameType = type;
     }
 
     public void startGame(){

@@ -17,6 +17,7 @@ import me.streafe.HubExtended.sql.SQL_Class;
 import me.streafe.HubExtended.utils.CustomSign;
 import me.streafe.HubExtended.utils.MenuListener;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Scoreboard;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -29,6 +30,7 @@ public class HubExtended extends JavaPlugin {
     private SQL_Class sql_class;
     public Map<String, Minigame> minigameHashMap;
     private Map<UUID,HubPlayer> hubPlayerList;
+    private Scoreboard mainScoreboard;
 
     public void onEnable(){
         instance = this;
@@ -38,6 +40,8 @@ public class HubExtended extends JavaPlugin {
         getCommand("msg").setExecutor(new BungeeMessage());
         getCommand("hub").setExecutor(new BungeeConnect());
         getCommand("sethub").setExecutor(new BungeeConnect());
+
+        this.mainScoreboard = this.getServer().getScoreboardManager().getNewScoreboard();
 
 
 
@@ -98,5 +102,9 @@ public class HubExtended extends JavaPlugin {
 
     public HubPlayer getHubPlayer(UUID uuid){
         return this.hubPlayerList.get(uuid);
+    }
+
+    public Scoreboard getMainScoreboard() {
+        return mainScoreboard;
     }
 }

@@ -8,7 +8,8 @@ public enum RankEnum {
     ,MODERATOR(ChatColor.AQUA + "MODERATOR")
     ,ADMIN(ChatColor.RED + "ADMIN")
     ,CO_OWNER(ChatColor.LIGHT_PURPLE + "CO-OWNER")
-    ,OWNER(ChatColor.DARK_RED + "OWNER");
+    ,OWNER(ChatColor.DARK_RED + "OWNER")
+    ,DEVELOPER(ChatColor.DARK_RED + "DEVELOPER");
 
     private String prefix;
 

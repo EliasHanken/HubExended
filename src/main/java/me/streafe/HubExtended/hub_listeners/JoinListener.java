@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class JoinListener implements Listener {
 
@@ -35,7 +36,7 @@ public class JoinListener implements Listener {
 
         AnimatedScoreboard animatedScoreboard = new AnimatedScoreboard(p);
         animatedScoreboard.animateText();
-        animatedScoreboard.view();
+        animatedScoreboard.updateScoreBoard();
 
         PlayerRankUpdate rankUpdate = new PlayerRankUpdate(p);
         rankUpdate.updatePlayerRank();
@@ -43,7 +44,8 @@ public class JoinListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerLeave(Player player){
+    public void onPlayerLeave(PlayerQuitEvent event){
+        Player player = event.getPlayer();
         HubPlayer hubPlayer = HubExtended.getInstance().getHubPlayer(player.getUniqueId());
 
         if(hubPlayer.inGame){
@@ -52,6 +54,8 @@ public class JoinListener implements Listener {
             for(HubPlayer partyPlayers : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerList){
                 partyPlayers.sendMessage(utils.translate("&7" + hubPlayer.getName() + " &cleft the party"));
             }
+        }else{
+            return;
         }
     }
 

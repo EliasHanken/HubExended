@@ -96,4 +96,9 @@ public class BungeeMessageListener implements PluginMessageListener {
         out.writeUTF(reason);
     }
 
+    public static String getServerName(Player player){
+        String text = "";
+        return text;
+    }
+
 }
