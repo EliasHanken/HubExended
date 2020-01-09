@@ -2,6 +2,7 @@ package me.streafe.HubExtended.utils;
 
 
 import net.minecraft.server.v1_8_R3.*;
+import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
@@ -20,6 +21,18 @@ public class PacketUtils {
         PacketPlayOutScoreboardDisplayObjective display = new PacketPlayOutScoreboardDisplayObjective(1,obj);
 
         obj.setDisplayName("Test");
+
+
+    }
+
+    public static void sendTitle(Player player, String text, ChatColor color){
+        IChatBaseComponent chatTitle = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + text + "\",color:" + color.name().toLowerCase() + "}");
+
+        PacketPlayOutTitle title = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE,chatTitle);
+        PacketPlayOutTitle length = new PacketPlayOutTitle(5,20,5);
+
+        sendPacket(player,title);
+        sendPacket(player,length);
 
 
     }

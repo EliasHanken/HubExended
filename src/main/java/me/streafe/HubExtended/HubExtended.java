@@ -16,6 +16,8 @@ import me.streafe.HubExtended.player_utils.HubPlayer;
 import me.streafe.HubExtended.sql.SQL_Class;
 import me.streafe.HubExtended.utils.CustomSign;
 import me.streafe.HubExtended.utils.MenuListener;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 
@@ -81,6 +83,28 @@ public class HubExtended extends JavaPlugin {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public Location getHubLocation(){
+        double x = HubExtended.getInstance().getConfig().getDouble("world.hubX");
+        double y = HubExtended.getInstance().getConfig().getDouble("world.hubY");
+        double z = HubExtended.getInstance().getConfig().getDouble("world.hubZ");
+        float pitch = (float) HubExtended.getInstance().getConfig().getDouble("world.hubPitch");
+        float yaw = (float) HubExtended.getInstance().getConfig().getDouble("world.hubYaw");
+        Location hubLoc = new Location(Bukkit.getWorld("world"),x,y,z,yaw,pitch);
+
+        return hubLoc;
+    }
+
+    public Location getLobbyLocation(){
+        double x = getConfig().getDouble("minigames.lobbySpawn.X");
+        double y = getConfig().getDouble("minigames.lobbySpawn.Y");
+        double z = getConfig().getDouble("minigames.lobbySpawn.Z");
+        float pitch = (float) getConfig().getDouble("minigames.lobbySpawn.Pitch");
+        float yaw = (float) getConfig().getDouble("minigames.lobbySpawn.Yaw");
+        Location loc = new Location(getServer().getWorld("world"),x,y,z,yaw,pitch);
+
+        return loc;
     }
 
     public static HubExtended getInstance(){

@@ -78,4 +78,8 @@ public class HubPlayer {
     public String getName(){
         return Bukkit.getPlayer(getUUID()).getName();
     }
+
+    public Player getPlayer(){
+        return this.player;
+    }
 }

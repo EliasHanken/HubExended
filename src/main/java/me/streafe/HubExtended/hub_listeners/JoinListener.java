@@ -48,14 +48,16 @@ public class JoinListener implements Listener {
         Player player = event.getPlayer();
         HubPlayer hubPlayer = HubExtended.getInstance().getHubPlayer(player.getUniqueId());
 
+        if(hubPlayer.inGame == false){
+            return;
+        }
+
         if(hubPlayer.inGame){
             HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).removePlayer(player);
 
             for(HubPlayer partyPlayers : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerList){
                 partyPlayers.sendMessage(utils.translate("&7" + hubPlayer.getName() + " &cleft the party"));
             }
-        }else{
-            return;
         }
     }
 

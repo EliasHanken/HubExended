@@ -29,7 +29,7 @@ public class PlayerRankUpdate {
     }
 
     public void updatePlayerRank(){
-        taskId = HubExtended.getInstance().getServer().getScheduler().runTaskTimer(HubExtended.getInstance(), new Runnable() {
+        taskId = HubExtended.getInstance().getServer().getScheduler().runTaskTimer(HubExtended.getInstance(), new BukkitRunnable() {
             @Override
             public void run() {
                 if(hubPlayer.rank == RankEnum.MEMBER){
