@@ -67,6 +67,8 @@ public class Menu implements Listener {
             rankMeta.setLore(Arrays.asList(utils.translate("&dCo-Owner")));
         }else if(hubPlayer.rank == RankEnum.OWNER){
             rankMeta.setLore(Arrays.asList(utils.translate("&4Owner")));
+        }else if(hubPlayer.rank == RankEnum.DEVELOPER){
+            rankMeta.setLore(Arrays.asList(utils.translate("&4Owner")));
         }
         rankItem.setItemMeta(rankMeta);
 

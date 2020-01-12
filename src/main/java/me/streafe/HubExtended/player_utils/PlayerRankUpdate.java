@@ -42,8 +42,17 @@ public class PlayerRankUpdate {
                     player.setDisplayName(sb.getTeam("MEMBER").getPrefix() + player.getName());
 
                     team = sb.getTeam("MEMBER");
-                }
-                else if(hubPlayer.rank == RankEnum.MODERATOR){
+                }else if(hubPlayer.rank == RankEnum.VIP){
+                    if(sb.getTeam("VIP") == null){
+                        sb.registerNewTeam("VIP");
+                    }
+                    sb.getTeam("VIP").setPrefix(utils.translate("&eVIP &7| "));
+
+                    sb.getTeam("VIP").addPlayer(player);
+                    player.setDisplayName(sb.getTeam("VIP").getPrefix() + player.getName());
+
+                    team = sb.getTeam("VIP");
+                } else if(hubPlayer.rank == RankEnum.MODERATOR){
                     if(sb.getTeam("MODERATOR") == null){
                         sb.registerNewTeam("MODERATOR");
                     }
@@ -98,7 +107,6 @@ public class PlayerRankUpdate {
                     player.setDisplayName(sb.getTeam("DEVELOPER").getPrefix() + player.getName());
 
                     team = sb.getTeam("DEVELOPER");
-
                 }
 
                 for(Player player : HubExtended.getInstance().getServer().getOnlinePlayers()){

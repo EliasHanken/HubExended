@@ -3,7 +3,9 @@ package me.streafe.HubExtended.minigames;
 public enum MinigameType {
 
     ARROW("ARROW"),
-    BARBARIAN("BARBARIAN");
+    BARBARIAN("BARBARIAN"),
+    OITC("OITC"),
+    FFA("FFA");
 
     private String name;
 

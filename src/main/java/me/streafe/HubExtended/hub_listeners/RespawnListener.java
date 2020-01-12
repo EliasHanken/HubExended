@@ -3,12 +3,10 @@ package me.streafe.HubExtended.hub_listeners;
 import me.streafe.HubExtended.HubExtended;
 import me.streafe.HubExtended.player_utils.HubPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -18,7 +16,7 @@ public class RespawnListener implements Listener {
     public void onPlayerDeath(PlayerRespawnEvent event){
         Player player = event.getPlayer();
         HubPlayer hubPlayer = HubExtended.getInstance().getHubPlayer(player.getUniqueId());
-        if(hubPlayer.inGame){
+        if(hubPlayer.isInGame()){
             Bukkit.getScheduler().scheduleSyncDelayedTask(HubExtended.getInstance(), () -> player.spigot().respawn(), 1L);
             return;
         }

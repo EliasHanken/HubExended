@@ -10,9 +10,9 @@ import java.util.UUID;
 
 public class HubPlayer {
 
-    private Player player;
+    public Player player;
     public boolean inGame = false;
-    private String gameID;
+    public String gameID;
     public boolean signEditEnable = false;
     public boolean superVanish = false;
     public int tokens;
@@ -20,6 +20,9 @@ public class HubPlayer {
     public RankEnum rank = RankEnum.MEMBER;
     public List<String> friends;
     public int wins;
+    public double level;
+    public String inventory;
+    public int gamePoints;
 
     public HubPlayer(Player player){
         this.player = player;
@@ -28,7 +31,7 @@ public class HubPlayer {
 
 
     public boolean inGame(HubPlayer hubPlayer){
-        if(this.inGame){
+        if(this.isInGame()){
             return true;
         }
         return false;
@@ -81,5 +84,13 @@ public class HubPlayer {
 
     public Player getPlayer(){
         return this.player;
+    }
+
+    public boolean isInGame() {
+        return inGame;
+    }
+
+    public void setInGame(boolean inGame) {
+        this.inGame = inGame;
     }
 }

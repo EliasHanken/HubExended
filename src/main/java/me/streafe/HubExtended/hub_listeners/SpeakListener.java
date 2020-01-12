@@ -29,22 +29,22 @@ public class SpeakListener implements Listener {
         this.player = e.getPlayer();
         HBConfigSetup hbConfigSetup = new HBConfigSetup(e.getPlayer());
         if(hbConfigSetup.get("player.rank").equals("MEMBER")){
-            Bukkit.getServer().broadcastMessage(utils.translate(this.player.getName() + ": ") + this.message);
+            Bukkit.getServer().broadcastMessage(utils.translate("&a"+hubPlayer.level + " &7"+this.player.getName() + ": ") + this.message);
         }
         else if(hbConfigSetup.get("player.rank").equals("VIP")){
-            Bukkit.getServer().broadcastMessage(utils.translate("&eVIP &7" + this.player.getName() + ": &f" + this.message));
+            Bukkit.getServer().broadcastMessage(utils.translate("&a"+hubPlayer.level+" &eVIP &7" + this.player.getName() + ": &f" + this.message));
         }
         else if(hbConfigSetup.get("player.rank").equals("MODERATOR")){
-            Bukkit.getServer().broadcastMessage(utils.translate("&3MOD &8" + this.player.getName() + ": &f" + this.message));
+            Bukkit.getServer().broadcastMessage(utils.translate("&a"+hubPlayer.level+" &3MOD &8" + this.player.getName() + ": &f" + this.message));
         }else if(hbConfigSetup.get("player.rank").equals("ADMIN")){
-            Bukkit.getServer().broadcastMessage(utils.translate("&cADMIN &7" + this.player.getName() + ": &f" + this.message));
+            Bukkit.getServer().broadcastMessage(utils.translate("&a"+hubPlayer.level+" "+"&cADMIN &7" + this.player.getName() + ": &f" + this.message));
         }else if(hbConfigSetup.get("player.rank").equals("CO_OWNER")) {
-            Bukkit.getServer().broadcastMessage(utils.translate("&dCO-OWNER &7" + this.player.getName() + ": &f" + this.message));
+            Bukkit.getServer().broadcastMessage(utils.translate("&a"+hubPlayer.level+" "+"&dCO-OWNER &7" + this.player.getName() + ": &f" + this.message));
         } else if(hbConfigSetup.get("player.rank").equals("OWNER")){
-            Bukkit.getServer().broadcastMessage(utils.translate("&4OWNER &7" + this.player.getName() + ": &f" + this.message));
+            Bukkit.getServer().broadcastMessage(utils.translate("&a"+hubPlayer.level+" "+"&4OWNER &7" + this.player.getName() + ": &f" + this.message));
         }
         else if(hbConfigSetup.get("player.rank").equals("DEVELOPER")){
-            Bukkit.getServer().broadcastMessage(utils.translate("&4DEVELOPER &7" + this.player.getName() + ": &f" + this.message));
+            Bukkit.getServer().broadcastMessage(utils.translate("&a"+hubPlayer.level+" "+"&4DEVELOPER &7" + this.player.getName() + ": &f" + this.message));
         }
     }
 }

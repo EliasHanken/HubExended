@@ -1,20 +1,20 @@
 package me.streafe.HubExtended.minigames;
 
 import me.streafe.HubExtended.HubExtended;
+import me.streafe.HubExtended.player_utils.HBConfigSetup;
 import me.streafe.HubExtended.player_utils.HubPlayer;
+import me.streafe.HubExtended.utils.ItemContent;
 import me.streafe.HubExtended.utils.PacketUtils;
 import me.streafe.HubExtended.utils.Utils;
-import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.scheduler.BukkitTask;
 
 public class MinigameCommand implements CommandExecutor {
     Utils utils = new Utils();
@@ -49,7 +49,7 @@ public class MinigameCommand implements CommandExecutor {
                     minigame = new Minigame(Integer.parseInt(args[2]), this.minigameType);
                     hubPlayer.sendMessage(utils.getPluginPrefix() + "Game ID: " + utils.translate("&d&l"+minigame.getGameID()) + utils.translate("&7")+ " (share with friends)");
                     minigame.addNewPlayer(player);
-                    hubPlayer.inGame = true;
+                    hubPlayer.setInGame(true);
 
                     hubPlayer.setGameID(minigame.getGameID());
                     HubExtended.getInstance().minigameHashMap.put(minigame.getGameID(), minigame);
@@ -58,6 +58,17 @@ public class MinigameCommand implements CommandExecutor {
                     hubPlayer.sendMessage(utils.translate("&7Max players: ") + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getMaxPlayers());
                     hubPlayer.sendMessage(utils.translate("&7Is started: ") + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).isStarted());
 
+                    ItemContent itemContent = new ItemContent(player);
+                    itemContent.savePlayerInventory(player);
+                    player.getInventory().clear();
+
+
+                } else if(args[0].equalsIgnoreCase("help")){
+                    player.sendMessage(utils.translate("&7-x- &dCommands and help for &c&ominigames&7-x-"));
+                    player.sendMessage(utils.translate("&e/minigames join player (playerName)"));
+                    player.sendMessage(utils.translate("&e/minigames leave"));
+                    player.sendMessage(utils.translate("&e/minigames create gameType[arrow, barbarian, oitc, ffa] maxPlayers[5,10...]"));
+                    player.sendMessage(utils.translate("&e/minigames settype gameType[arrow, barbarian, oitc, ffa]"));
                 }
                 /*
                 else if (args.length == 1 && args[0].equalsIgnoreCase("delete")) {
@@ -87,6 +98,27 @@ public class MinigameCommand implements CommandExecutor {
                     }
                 }
 
+                else if(args.length == 3 && args[0].equalsIgnoreCase("join")){
+                    if(args[1].equalsIgnoreCase("player")){
+                        HubPlayer joinTarget = HubExtended.getInstance().getHubPlayer(Bukkit.getPlayer(args[2]).getUniqueId());
+                        if(!(HubExtended.getInstance().getMinigameByID(joinTarget.gameID) == null)){
+                            HubExtended.getInstance().getMinigameByID(joinTarget.gameID).addNewPlayer(player);
+                            player.sendMessage(utils.getPluginPrefix() + "you joined the game with ID: " + joinTarget.getGameID());
+                            hubPlayer.setGameID(joinTarget.gameID);
+                            hubPlayer.sendMessage("Your game id is: " + hubPlayer.getGameID());
+                            hubPlayer.setInGame(true);
+
+                            ItemContent itemContent = new ItemContent(player);
+                            itemContent.savePlayerInventory(player);
+                            player.getInventory().clear();
+                        }else{
+                            player.sendMessage(utils.translate("&cThat party is not available"));
+                            return true;
+                        }
+
+                    }
+                }
+
                 else if (args.length == 2 && args[0].equalsIgnoreCase("join")) {
                     if(HubExtended.getInstance().getMinigameByID(args[1]).isStarted()){
                         player.sendMessage(utils.translate("&cThe minigame has already started"));
@@ -96,15 +128,22 @@ public class MinigameCommand implements CommandExecutor {
                         hubPlayer.sendMessage(utils.getPluginPrefix() + "&cYou are already in this game");
                         return true;
                     }
-                    else if(HubExtended.getInstance().getHubPlayer(player.getUniqueId()).inGame){
+                    else if(HubExtended.getInstance().getHubPlayer(player.getUniqueId()).isInGame()){
                         hubPlayer.sendMessage(utils.getPluginPrefix() + utils.translate("&cYou are already in a game"));
                         return true;
                     }
+
                     HubExtended.getInstance().getMinigameByID(args[1]).addNewPlayer(player);
                     player.sendMessage(utils.getPluginPrefix() + "you joined the game with ID: " + HubExtended.getInstance().getMinigameByID(args[1]).getGameID());
                     hubPlayer.setGameID(args[1]);
                     hubPlayer.sendMessage("Your game id is: " + hubPlayer.getGameID());
-                    hubPlayer.inGame = true;
+                    hubPlayer.setInGame(true);
+
+                    HubExtended.getInstance().getMinigameByID(args[1]).playerAmount++;
+
+                    ItemContent itemContent = new ItemContent(player);
+                    itemContent.savePlayerInventory(player);
+                    player.getInventory().clear();
 
                     for(HubPlayer partyPlayers : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerList){
                         if(!(partyPlayers.getName().equalsIgnoreCase(hubPlayer.getName()))){
@@ -114,7 +153,7 @@ public class MinigameCommand implements CommandExecutor {
 
                 } else if(args.length == 1 && args[0].equalsIgnoreCase("list")){
                     hubPlayer.sendMessage(utils.getPluginPrefix() + "Your game id is: " + hubPlayer.getGameID());
-                    hubPlayer.sendMessage("Gametype: " + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getType().toString());
+                    hubPlayer.sendMessage("Gametype: " + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).minigameType.getName());
                     hubPlayer.sendMessage("started: " + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).isStarted());
                     hubPlayer.sendMessage(utils.translate("&7List:"));
                     hubPlayer.sendMessage(utils.translate("&7") + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getPlayerListString());
@@ -122,23 +161,50 @@ public class MinigameCommand implements CommandExecutor {
                 else if(args.length == 1 && args[0].equalsIgnoreCase("leave")){
 
                     if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getOwner() == player){
+                        HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerAmount--;
                         for(HubPlayer partyPlayers : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerList){
                             partyPlayers.sendMessage(utils.translate("&7" + hubPlayer.getName() + " &cleft the party"));
                             HubExtended.getInstance().minigameHashMap.remove(partyPlayers.getGameID());
 
-                            partyPlayers.inGame = false;
+
+                            partyPlayers.setInGame(false);
                             partyPlayers.setGameID("");
 
+                            /*
                             partyPlayers.sendMessage(utils.getPluginPrefix() + "You left the gameparty");
-                            partyPlayers.getPlayer().teleport(HubExtended.getInstance().getHubLocation());
+
+                             */
+                            if(partyPlayers.inGame){
+                                partyPlayers.getPlayer().teleport(HubExtended.getInstance().getHubLocation());
+                            }
+
+
+                            /*
+                            Bukkit.getPlayer(partyPlayers.getUUID()).getInventory().clear();
+
+                             */
+                            if(partyPlayers.getName().equalsIgnoreCase(hubPlayer.getName())){
+                                HBConfigSetup hbConfigSetup = new HBConfigSetup(Bukkit.getPlayer(partyPlayers.getUUID()));
+                                ItemContent itemContent = new ItemContent(Bukkit.getPlayer(partyPlayers.getUUID()));
+                                Bukkit.getPlayer(partyPlayers.getUUID()).getInventory().setContents(itemContent.getSavedPlayerInventory(hbConfigSetup.get("player.inventory")));
+
+                            }
+
+
+
 
                             //TODO implement different gamemodes and add inventory to chose one
 
                         }
-                        hubPlayer.inGame = false;
+                        hubPlayer.setInGame(false);
                         hubPlayer.setGameID("");
 
                         hubPlayer.sendMessage(utils.getPluginPrefix() + "You left the gameparty and deleted it");
+
+                        player.getInventory().clear();
+                        HBConfigSetup hbConfigSetup = new HBConfigSetup(player);
+                        ItemContent itemContent = new ItemContent(player);
+                        player.getInventory().setContents(itemContent.getSavedPlayerInventory(hbConfigSetup.get("player.inventory")));
 
                     }
 
@@ -150,12 +216,18 @@ public class MinigameCommand implements CommandExecutor {
                         }
                         HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).removePlayer(player);
                         HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerAmount--;
-                        hubPlayer.inGame = false;
+                        hubPlayer.setInGame(false);
                         hubPlayer.setGameID("");
 
                         hubPlayer.sendMessage(utils.getPluginPrefix() + "You left the gameparty");
+
+                        player.getInventory().clear();
+                        HBConfigSetup hbConfigSetup = new HBConfigSetup(player);
+                        ItemContent itemContent = new ItemContent(player);
+                        player.getInventory().setContents(itemContent.getSavedPlayerInventory(hbConfigSetup.get("player.inventory")));
                     }
                     hubPlayer.getPlayer().teleport(HubExtended.getInstance().getHubLocation());
+
 
                 }
 
@@ -166,7 +238,6 @@ public class MinigameCommand implements CommandExecutor {
                             player.sendMessage(utils.translate("&cWant to start it anyway? Do /minigames startanyway"));
                             return true;
                         }
-                        HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).setStarted(true);
                         for(HubPlayer players : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getPlayerList()){
 
                             players.getPlayer().teleport(HubExtended.getInstance().getLobbyLocation());
@@ -211,7 +282,8 @@ public class MinigameCommand implements CommandExecutor {
                                         hubPlayer.sendMessage(utils.translate("&cSomeone left your lobby"));
                                         cancelTask();
                                         if(!players.getName().equalsIgnoreCase(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getOwner().getName())){
-                                            players.getPlayer().teleport(HubExtended.getInstance().getHubLocation());
+                                            players.getPlayer().teleport(HubExtended.getInstance().getLobbyLocation());
+
 
                                             if(isRunning()){
                                                 cancelTask();

@@ -4,7 +4,8 @@ import org.bukkit.ChatColor;
 
 public enum RankEnum {
 
-    MEMBER(ChatColor.DARK_GRAY + "MEMBER")
+    MEMBER(ChatColor.DARK_GRAY + "MEMBER"),
+    VIP(ChatColor.DARK_GRAY + "VIP")
     ,MODERATOR(ChatColor.AQUA + "MODERATOR")
     ,ADMIN(ChatColor.RED + "ADMIN")
     ,CO_OWNER(ChatColor.LIGHT_PURPLE + "CO-OWNER")
@@ -20,5 +21,7 @@ public enum RankEnum {
     public String getPrefix(){
         return prefix;
     }
+
+
 
 }

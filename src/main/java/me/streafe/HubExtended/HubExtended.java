@@ -12,6 +12,7 @@ import me.streafe.HubExtended.hub_listeners.JoinListener;
 import me.streafe.HubExtended.hub_listeners.SpeakListener;
 import me.streafe.HubExtended.minigames.Minigame;
 import me.streafe.HubExtended.minigames.MinigameCommand;
+import me.streafe.HubExtended.minigames.MinigameHandler;
 import me.streafe.HubExtended.player_utils.HubPlayer;
 import me.streafe.HubExtended.sql.SQL_Class;
 import me.streafe.HubExtended.utils.CustomSign;
@@ -63,6 +64,7 @@ public class HubExtended extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new RespawnListener(),this);
         getServer().getPluginManager().registerEvents(new BlockListener(),this);
         getServer().getPluginManager().registerEvents(new SpeakListener(),this);
+        getServer().getPluginManager().registerEvents(new Minigame(),this);
 
         getCommand("minigames").setExecutor(new MinigameCommand());
         getCommand("settings").setExecutor(new menu_command());

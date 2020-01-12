@@ -20,7 +20,6 @@ public class HBConfigSetup {
     public HBConfigSetup(Player player){
         this.player = player;
         this.hubPlayer = HubExtended.getInstance().getHubPlayer(this.player.getUniqueId());
-
         setHubPlayer();
     }
 
@@ -66,6 +65,8 @@ public class HBConfigSetup {
             yaml.set("player.joinDate",joinDate);
             yaml.set("player.friends", Arrays.asList("Streafe", "atob"));
             yaml.set("player.wins",0);
+            yaml.set("player.level",0.0);
+            yaml.set("player.inventory", "");
             if(hubPlayer.rank == RankEnum.MEMBER){
                 yaml.set("player.rank","MEMBER");
             }else if(hubPlayer.rank == RankEnum.MODERATOR){
@@ -91,9 +92,15 @@ public class HBConfigSetup {
             hubPlayer.tokens = yaml.getInt("player.tokens");
             hubPlayer.friends = Arrays.asList(yaml.getString("player.friends"));
             hubPlayer.wins = yaml.getInt("player.wins");
+
+            hubPlayer.level = yaml.getDouble("player.level");
+            hubPlayer.inventory = yaml.getString("player.inventory");
+
             if(yaml.get("player.rank").equals("MEMBER")){
                 hubPlayer.setRank(RankEnum.MEMBER);
-            }else if(yaml.get("player.rank").equals("MODERATOR")){
+            }else if(yaml.get("player.rank").equals("VIP")){
+                hubPlayer.setRank(RankEnum.VIP);
+            } else if(yaml.get("player.rank").equals("MODERATOR")){
                 hubPlayer.setRank(RankEnum.MODERATOR);
             }else if(yaml.get("player.rank").equals("ADMIN")){
                 hubPlayer.setRank(RankEnum.ADMIN);
@@ -101,8 +108,8 @@ public class HBConfigSetup {
                 hubPlayer.setRank(RankEnum.CO_OWNER);
             } else if(yaml.get("player.rank").equals("OWNER")){
                 hubPlayer.setRank(RankEnum.OWNER);
-            }else if(hubPlayer.rank == RankEnum.DEVELOPER){
-                yaml.set("player.rank","DEVELOPER");
+            }else if(yaml.get("player.rank").equals("DEVELOPER")){
+                hubPlayer.setRank(RankEnum.DEVELOPER);
             }
             yaml.options().copyDefaults(true);
             try {
@@ -115,7 +122,79 @@ public class HBConfigSetup {
 
     }
 
+    public void ifExists(){
+        String joinDate = new SimpleDateFormat("dd-MM-yyyy").format(System.currentTimeMillis());
+        YamlConfiguration yaml = YamlConfiguration.loadConfiguration(playerFile);
+        yaml.set("player.name",player.getName());
+        yaml.set("player.tokens",hubPlayer.tokens);
+        yaml.set("player.tokens",3);
+        yaml.set("player.joinDate",joinDate);
+        yaml.set("player.friends", Arrays.asList("Streafe", "atob"));
+        yaml.set("player.wins",0);
+        yaml.set("player.experience",0.0);
+        if(hubPlayer.rank == RankEnum.MEMBER){
+            yaml.set("player.rank","MEMBER");
+        }else if(hubPlayer.rank == RankEnum.VIP){
+            yaml.set("player.rank","VIP");
+        }else if(hubPlayer.rank == RankEnum.MODERATOR){
+            yaml.set("player.rank","MODERATOR");
+        }else if(hubPlayer.rank == RankEnum.CO_OWNER){
+            yaml.set("player.rank","CO_OWNER");
+        }else if(hubPlayer.rank == RankEnum.OWNER){
+            yaml.set("player.rank","OWNER");
+        }else if(hubPlayer.rank == RankEnum.DEVELOPER){
+            yaml.set("player.rank","DEVELOPER");
+        }
+        yaml.options().copyDefaults(true);
+        try {
+            yaml.save(playerFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void ifNotExists() {
+        String joinDate = new SimpleDateFormat("dd-MM-yyyy").format(System.currentTimeMillis());
+        YamlConfiguration yaml = YamlConfiguration.loadConfiguration(playerFile);
+        yaml.set("player.name", player.getName());
+        yaml.set("player.tokens", hubPlayer.tokens);
+        yaml.set("player.tokens", 3);
+        yaml.set("player.joinDate", joinDate);
+        yaml.set("player.friends", Arrays.asList("Streafe", "atob"));
+        yaml.set("player.wins", 0);
+        yaml.set("player.experience", 0.0);
+        yaml.set("player.inventory", "");
+        if (hubPlayer.rank == RankEnum.MEMBER) {
+            yaml.set("player.rank", "MEMBER");
+        } else if (hubPlayer.rank == RankEnum.VIP) {
+            yaml.set("player.rank", "VIP");
+        }else if (hubPlayer.rank == RankEnum.MODERATOR) {
+            yaml.set("player.rank", "MODERATOR");
+        } else if (hubPlayer.rank == RankEnum.CO_OWNER) {
+            yaml.set("player.rank", "CO_OWNER");
+        } else if (hubPlayer.rank == RankEnum.OWNER) {
+            yaml.set("player.rank", "OWNER");
+        } else if (hubPlayer.rank == RankEnum.DEVELOPER) {
+            yaml.set("player.rank", "DEVELOPER");
+        }
+        yaml.options().copyDefaults(true);
+        try {
+            yaml.save(playerFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public void editString(String string,int value){
+        YamlConfiguration yaml = YamlConfiguration.loadConfiguration(playerFile);
+        yaml.set(string,value);
+        try {
+            yaml.save(playerFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void editString(String string,String value){
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(playerFile);
         yaml.set(string,value);
         try {
@@ -128,6 +207,11 @@ public class HBConfigSetup {
     public int getInt(String string){
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(playerFile);
         return yaml.getInt(string);
+    }
+
+    public double getDouble(String string){
+        YamlConfiguration yaml = YamlConfiguration.loadConfiguration(playerFile);
+        return yaml.getDouble(string);
     }
 
     public String get(String string){

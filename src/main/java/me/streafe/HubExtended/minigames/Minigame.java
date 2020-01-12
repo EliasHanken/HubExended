@@ -2,26 +2,40 @@ package me.streafe.HubExtended.minigames;
 
 import me.streafe.HubExtended.HubExtended;
 import me.streafe.HubExtended.player_utils.HubPlayer;
+import me.streafe.HubExtended.utils.PacketUtils;
+import me.streafe.HubExtended.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Minigame implements Listener {
 
     private int maxPlayers;
     private String gameID;
     public List<HubPlayer> playerList;
-    private Player owner;
+    public Player owner;
     private MinigameType type;
-    private boolean started = false;
+    public GameState gameState = GameState.LOBBY;
     private Location spawnLoc;
     public int playerAmount;
     public MinigameType minigameType;
+    public HubPlayer winner;
+    private Map<UUID, ItemStack[]> playerInv;
+    public Map<UUID,Integer> playerScores;
+
+    Utils utils = new Utils();
 
 
     public Minigame(int maxPlayers, MinigameType type){
@@ -32,10 +46,111 @@ public class Minigame implements Listener {
         this.minigameType = type;
     }
 
+    public Minigame(){
+
+    }
+
     public void startGame(){
         for(HubPlayer players : playerList){
-            players.sendMessage("Game started!");
+            this.gameState = GameState.STARTED;
+            players.setInGame(true);
+            players.gamePoints = 0;
+            PacketUtils.sendTitle(Bukkit.getPlayer(players.getUUID()),"Game started " + utils.translate("&7"+minigameType), ChatColor.GREEN);
+
+            if(minigameType == MinigameType.OITC){
+                startOITC();
+                winner = HubExtended.getInstance().getHubPlayer(Bukkit.getPlayer("7b2a24f8-c3a9-41d0-8f18-4ada0c23e428").getUniqueId());
+                endGame();
+            }
+
+            OITCKit kit = new OITCKit();
+            kit.setOITCInventory(Bukkit.getPlayer(players.getUUID()));
+
         }
+    }
+
+    @EventHandler
+    public void onPlayerHurt(EntityDamageByEntityEvent e){
+
+        HubPlayer hubPlayer = HubExtended.getInstance().getHubPlayer(e.getEntity().getUniqueId());
+
+
+            if(hubPlayer.inGame){
+                if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).gameState == GameState.STARTED){
+                    if(hubPlayer.gamePoints >= 1){
+                        gameEnd();
+                        gameState = GameState.FINISHED;
+                    }
+                    Player player = (Player) e.getEntity();
+                    Player damager = (Player) e.getDamager();
+                    damager.sendMessage(utils.translate("&aYou got one point for killing &c&o" + e.getEntity().getName()));
+
+                    damager.sendMessage("You have " + hubPlayer.gamePoints);
+                    hubPlayer.gamePoints += 1;
+
+
+                    player.teleport(HubExtended.getInstance().getLobbyLocation());
+                    player.setHealth(20);
+
+
+
+                }
+                else{
+
+                    e.setCancelled(true);
+                }
+            }else {
+
+                e.setCancelled(true);
+            }
+    }
+
+    public void startOITC(){
+        MinigameCountdownTask oitc = new MinigameCountdownTask(0L,10L) {
+            @Override
+            public void run() {
+                if(gameState == GameState.FINISHED){
+
+                    endGame();
+                    cancelTask();
+                }
+
+                if(winner != null){
+                    gameState = GameState.FINISHED;
+                }
+
+                for(HubPlayer hubPlayers : playerList){
+                    if(hubPlayers.gamePoints >= 1){
+                        winner = hubPlayers;
+                        gameState = GameState.FINISHED;
+                    }
+                }
+            }
+        };
+    }
+
+    public void gameEnd(){
+
+    }
+
+
+
+    public void endGame(){
+        for(HubPlayer players : playerList){
+            Bukkit.getPlayer(players.getUUID()).teleport(HubExtended.getInstance().getLobbyLocation());
+            PacketUtils.sendTitle(Bukkit.getPlayer(players.getUUID()),"&cGame End!", ChatColor.RED);
+        }
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for(HubPlayer players : playerList){
+                    Bukkit.getPlayer(players.getUUID()).teleport(HubExtended.getInstance().getLobbyLocation());
+                    PacketUtils.sendTitle(Bukkit.getPlayer(players.getUUID()),"&a"+winner.getName() + " won the game!", ChatColor.RED);
+                    gameState = GameState.LOBBY;
+                    players.setInGame(false);
+                }
+            }
+        }.runTaskLaterAsynchronously(HubExtended.getInstance(),100L);
     }
 
     public void addNewPlayer(Player player){
@@ -48,7 +163,7 @@ public class Minigame implements Listener {
     }
 
     public void setType(MinigameType type){
-        this.type = type;
+        this.minigameType = type;
     }
 
     public void setOwner(Player player){
@@ -56,7 +171,10 @@ public class Minigame implements Listener {
     }
 
     public Player getOwner(){
-        return this.owner;
+        if(this.owner != null){
+            return this.owner;
+        }
+        return null;
     }
 
     private void setRandomID(){
@@ -115,11 +233,18 @@ public class Minigame implements Listener {
     }
 
     public boolean isStarted() {
-        return started;
+        if(this.gameState == GameState.STARTED || this.gameState == GameState.FINISHED){
+            return true;
+        }
+        return false;
     }
 
-    public void setStarted(boolean started) {
-        this.started = started;
+
+    public ItemStack[] getPlayerInv(UUID uuid) {
+        return this.playerInv.get(uuid);
     }
 
+    public void addPlayerInv(UUID uuid, ItemStack[] inv) {
+        this.playerInv.put(uuid,inv);
+    }
 }

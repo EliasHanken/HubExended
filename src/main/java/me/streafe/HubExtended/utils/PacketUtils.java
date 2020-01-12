@@ -34,6 +34,5 @@ public class PacketUtils {
         sendPacket(player,title);
         sendPacket(player,length);
 
-
     }
 }

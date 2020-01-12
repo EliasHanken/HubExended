@@ -7,7 +7,6 @@ import me.streafe.HubExtended.player_utils.HBConfigSetup;
 import me.streafe.HubExtended.player_utils.HubPlayer;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
@@ -23,6 +22,7 @@ public class AnimatedScoreboard {
     private int animateTask;
     public String animatedText;
     int time;
+    public ScoreboardScore owner;
 
     Utils utils = new Utils();
 
@@ -74,29 +74,44 @@ public class AnimatedScoreboard {
         MinigameCountdownTask updateScoreTask = new MinigameCountdownTask(0L, 20L) {
             @Override
             public void run() {
-                if (hubPlayer.inGame) {
+                if (hubPlayer.isInGame()) {
                     HBConfigSetup hbConfigSetup = new HBConfigSetup(player);
                     tokens = hbConfigSetup.getInt("player.tokens");
 
                     net.minecraft.server.v1_8_R3.Scoreboard board = new net.minecraft.server.v1_8_R3.Scoreboard();
-                    ScoreboardObjective obj = board.registerObjective("§b§lLobby Mode", IScoreboardCriteria.b);
+                    ScoreboardObjective obj = board.registerObjective("§eLobby Mode", IScoreboardCriteria.b);
                     board.setDisplaySlot(1, obj);
 
                     PacketPlayOutScoreboardObjective removepacket = new PacketPlayOutScoreboardObjective(obj, 1);
                     PacketPlayOutScoreboardObjective createpacket = new PacketPlayOutScoreboardObjective(obj, 0);
                     PacketPlayOutScoreboardDisplayObjective display = new PacketPlayOutScoreboardDisplayObjective(1, obj);
 
-                    ScoreboardScore header = new ScoreboardScore(board, obj, utils.translate("&bGame ID: ") + hubPlayer.getGameID());
-                    ScoreboardScore owner = new ScoreboardScore(board, obj, utils.translate("&bParty leader: " + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getOwner().getName()));
-                    ScoreboardScore list = new ScoreboardScore(board, obj, utils.translate("&bPlayer amount: ") + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerAmount);
+                    ScoreboardScore header = new ScoreboardScore(board, obj, utils.translate("&7Game ID: &c&o") + hubPlayer.getGameID());
+                    /*
+                    if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getOwner() == null){
+                        owner = new ScoreboardScore(board, obj, utils.translate("&7Party leader: &a" + "&c&o@null &cleave!" ));
+                    }else{
+                        owner = new ScoreboardScore(board, obj, utils.translate("&7Party leader: &a" + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getOwner().getName()));
+                    }
+
+                     */
+
+                    owner = new ScoreboardScore(board, obj, utils.translate("&7Party leader: &a" + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getOwner().getName()));
+                    ScoreboardScore list = new ScoreboardScore(board, obj, utils.translate("&7Player amount: &a") + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerAmount);
+                    ScoreboardScore leave1 = new ScoreboardScore(board,obj,utils.translate("    &7in case you want to leave"));
+                    ScoreboardScore leave2 = new ScoreboardScore(board,obj,utils.translate("    &7use &c&o/minigames leave"));
 
                     header.setScore(8);
                     owner.setScore(7);
                     list.setScore(6);
+                    leave1.setScore(5);
+                    leave2.setScore(4);
 
                     PacketPlayOutScoreboardScore ps1 = new PacketPlayOutScoreboardScore(header);
                     PacketPlayOutScoreboardScore ps2 = new PacketPlayOutScoreboardScore(owner);
                     PacketPlayOutScoreboardScore ps3 = new PacketPlayOutScoreboardScore(list);
+                    PacketPlayOutScoreboardScore ps4 = new PacketPlayOutScoreboardScore(leave1);
+                    PacketPlayOutScoreboardScore ps5 = new PacketPlayOutScoreboardScore(leave2);
 
                     PacketUtils.sendPacket(player, removepacket);
                     PacketUtils.sendPacket(player, createpacket);
@@ -105,9 +120,11 @@ public class AnimatedScoreboard {
                     PacketUtils.sendPacket(player, ps1);
                     PacketUtils.sendPacket(player, ps2);
                     PacketUtils.sendPacket(player, ps3);
+                    PacketUtils.sendPacket(player, ps4);
+                    PacketUtils.sendPacket(player, ps5);
 
                     return;
-                } else if (!hubPlayer.inGame) {
+                } else if (!hubPlayer.isInGame()) {
                     HBConfigSetup hbConfigSetup = new HBConfigSetup(player);
 
                     tokens = hbConfigSetup.getInt("player.tokens");
@@ -126,6 +143,8 @@ public class AnimatedScoreboard {
 
                     if (hbConfigSetup.get("player.rank").equalsIgnoreCase("MEMBER")) {
                         prefix = "&7";
+                    }else if (hbConfigSetup.get("player.rank").equalsIgnoreCase("VIP")) {
+                        prefix = "&e";
                     } else if (hbConfigSetup.get("player.rank").equalsIgnoreCase("MODERATOR")) {
                         prefix = "&3";
                     } else if (hbConfigSetup.get("player.rank").equalsIgnoreCase("ADMIN")) {
@@ -147,6 +166,23 @@ public class AnimatedScoreboard {
                     ScoreboardScore s7 = new ScoreboardScore(board, obj, utils.translate("  &bOnline: &f" + HubExtended.getInstance().getServer().getOnlinePlayers().size()));
                     ScoreboardScore s8 = new ScoreboardScore(board, obj, utils.translate("  &bLocation: &f" + BungeeMessageListener.getServerName(player)));
                     ScoreboardScore s9 = new ScoreboardScore(board, obj, utils.translate("  &bWins: &f" + hubPlayer.wins));
+                    ScoreboardScore s10 = new ScoreboardScore(board, obj, utils.translate("  &bLevel: &a" + hubPlayer.level));
+
+                    /*
+                    if(hubPlayer.inGame){
+                        ScoreboardScore s11 = new ScoreboardScore(board, obj, utils.translate("  &bIn game: &atrue"));
+                        s11.setScore(-2);
+                        PacketPlayOutScoreboardScore ps11 = new PacketPlayOutScoreboardScore(s11);
+                        PacketUtils.sendPacket(player, ps11);
+                    }else{
+                        ScoreboardScore s11 = new ScoreboardScore(board, obj, utils.translate("  &bIn game: &afalse"));
+                        s11.setScore(-2);
+                        PacketPlayOutScoreboardScore ps11 = new PacketPlayOutScoreboardScore(s11);
+                        PacketUtils.sendPacket(player, ps11);
+                    }
+
+                     */
+
 
                     s1.setScore(8);
                     s2.setScore(7);
@@ -157,6 +193,8 @@ public class AnimatedScoreboard {
                     s7.setScore(2);
                     s8.setScore(1);
                     s9.setScore(0);
+                    s10.setScore(-1);
+
 
                     PacketPlayOutScoreboardScore ps1 = new PacketPlayOutScoreboardScore(s1);
                     PacketPlayOutScoreboardScore ps2 = new PacketPlayOutScoreboardScore(s2);
@@ -167,6 +205,8 @@ public class AnimatedScoreboard {
                     PacketPlayOutScoreboardScore ps7 = new PacketPlayOutScoreboardScore(s7);
                     PacketPlayOutScoreboardScore ps8 = new PacketPlayOutScoreboardScore(s8);
                     PacketPlayOutScoreboardScore ps9 = new PacketPlayOutScoreboardScore(s9);
+                    PacketPlayOutScoreboardScore ps10 = new PacketPlayOutScoreboardScore(s10);
+
 
                     PacketUtils.sendPacket(player, removepacket);
                     PacketUtils.sendPacket(player, createpacket);
@@ -181,6 +221,8 @@ public class AnimatedScoreboard {
                     PacketUtils.sendPacket(player, ps7);
                     PacketUtils.sendPacket(player, ps8);
                     PacketUtils.sendPacket(player, ps9);
+                    PacketUtils.sendPacket(player, ps10);
+
                 }
 
             }
