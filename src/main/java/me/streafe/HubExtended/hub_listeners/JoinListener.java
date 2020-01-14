@@ -51,7 +51,31 @@ public class JoinListener implements Listener {
         hub_handler hubH = new hub_handler();
         hubH.handleHubPlayers(p,20L);
 
+    }
 
+    public static void updateOnlinePlayers(Player p){
+        HubPlayer hubPlayer = HubExtended.getInstance().getHubPlayer(p.getUniqueId());
+
+        HubExtended.getInstance().addPlayerToList(new HubPlayer(p));
+
+
+        hbConfigSetup = new HBConfigSetup(p);
+        hbConfigSetup.setHubPlayer();
+
+
+        UpdatePlayerRun updatePlayerRun = new UpdatePlayerRun();
+
+        updatePlayerRun.playerUpdateEveryLong(p,50L);
+
+        AnimatedScoreboard animatedScoreboard = new AnimatedScoreboard(p);
+        animatedScoreboard.animateText();
+        animatedScoreboard.updateScoreBoard();
+
+        PlayerRankUpdate rankUpdate = new PlayerRankUpdate(p);
+        rankUpdate.updatePlayerRank();
+
+        hub_handler hubH = new hub_handler();
+        hubH.handleHubPlayers(p,20L);
     }
 
     public static HBConfigSetup getHbConfigSetup(){
@@ -61,6 +85,8 @@ public class JoinListener implements Listener {
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event){
         Player player = event.getPlayer();
+
+        if(HubExtended.getInstance().getHubPlayer(player.getUniqueId()) == null)return;
         HubPlayer hubPlayer = HubExtended.getInstance().getHubPlayer(player.getUniqueId());
 
         event.setQuitMessage("");
@@ -71,41 +97,49 @@ public class JoinListener implements Listener {
             return;
         }
 
-        if(hubPlayer.isInGame()){
             HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).removePlayer(player);
 
-            for(HubPlayer partyPlayers : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerList){
+            for(HubPlayer partyPlayers : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerList) {
                 partyPlayers.sendMessage(utils.translate("&7" + hubPlayer.getName() + " &cleft the party"));
             }
-        }
+
+            HubExtended.getInstance().getHubPlayerList().remove(hubPlayer);
+            HubExtended.getInstance().getLogger().info(utils.translate("&cRemoved HubPlayer ") + player.getName());
     }
 
     @EventHandler
     public void onPlayerHurt(EntityDamageEvent e){
 
-        if(e.getEntity() instanceof Player){
-            Player p = (Player) e.getEntity();
+        if(!(e.getEntity() instanceof Player)){
+            return;
 
-            if(e.getCause() == EntityDamageEvent.DamageCause.FALL){
-                e.setCancelled(true);
-            }
+        }
+
+        if(e.getCause() == EntityDamageEvent.DamageCause.FALL){
+            e.setCancelled(true);
         }
     }
 
+    /*
     @EventHandler
     public void onPlayerHurt(EntityDamageByEntityEvent e){
 
+        if(!(e.getEntity() instanceof Player)){
+            return;
+        }
         if(e.getEntity() instanceof Player){
             Player p = (Player) e.getEntity();
             HubPlayer hubPlayer = HubExtended.getInstance().getHubPlayer(p.getUniqueId());
 
+            if(!(e.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK)){
+                return;
+            }
+
             if(e.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK){
-                if(hubPlayer.inGame){
-                    if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).gameState == GameState.STARTED){
-                    }else{
-                        e.getDamager().sendMessage(utils.translate("&c(!) &7No pvp here"));
-                        e.setCancelled(true);
-                    }
+                if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).gameState == GameState.STARTED){
+                    e.setCancelled(false);
+                }
+
                 }else{
                     e.getDamager().sendMessage(utils.translate("&c(!) &7No pvp here"));
                     e.setCancelled(true);
@@ -113,7 +147,9 @@ public class JoinListener implements Listener {
 
             }
         }
-    }
+
+     */
+
 
 
 }

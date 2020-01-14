@@ -4,13 +4,13 @@ public enum GameState {
 
     LOBBY("LOBBY"), STARTED("STARTED"), FINISHED("FINISHED");
 
-    String name;
+    private String name;
 
     GameState(String name){
         this.name = name;
     }
 
-    String getName(){
+    public String getName(){
         return this.name;
     }
 }

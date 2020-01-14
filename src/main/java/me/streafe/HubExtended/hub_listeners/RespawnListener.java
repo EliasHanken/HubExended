@@ -17,7 +17,7 @@ public class RespawnListener implements Listener {
         Player player = event.getPlayer();
         HubPlayer hubPlayer = HubExtended.getInstance().getHubPlayer(player.getUniqueId());
         if(hubPlayer.isInGame()){
-            Bukkit.getScheduler().scheduleSyncDelayedTask(HubExtended.getInstance(), () -> player.spigot().respawn(), 1L);
+            Bukkit.getPlayer(hubPlayer.getUUID()).teleport(HubExtended.getInstance().getLobbyLocation());
             return;
         }
         Bukkit.getScheduler().scheduleSyncDelayedTask(HubExtended.getInstance(), () -> player.spigot().respawn(), 1L);

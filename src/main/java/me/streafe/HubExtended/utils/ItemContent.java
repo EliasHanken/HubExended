@@ -43,6 +43,22 @@ public class ItemContent {
         //Could not convert to base64, do not save
     }
 
+    public void savePlayerInventoryBackup(Player p) {
+
+        try {
+            String base64 = inventoryToBase64(p.getInventory());
+            //Save this string to file.
+            HBConfigSetup hbConfigSetup = new HBConfigSetup(player);
+            hbConfigSetup.editString("player.inventoryBackup","");
+            hbConfigSetup.editString("player.inventoryBackup",base64);
+            return;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //Could not convert to base64, do not save
+    }
+
     public ItemStack[] getSavedPlayerInventory(String data) {
 
         try {

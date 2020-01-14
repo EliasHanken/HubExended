@@ -11,7 +11,7 @@ import java.util.UUID;
 public class HubPlayer {
 
     public Player player;
-    public boolean inGame = false;
+    public boolean inGame;
     public String gameID;
     public boolean signEditEnable = false;
     public boolean superVanish = false;

@@ -13,12 +13,17 @@ import me.streafe.HubExtended.hub_listeners.SpeakListener;
 import me.streafe.HubExtended.minigames.Minigame;
 import me.streafe.HubExtended.minigames.MinigameCommand;
 import me.streafe.HubExtended.minigames.MinigameHandler;
+import me.streafe.HubExtended.minigames.OITCCommand;
+import me.streafe.HubExtended.player_utils.HBConfigSetup;
 import me.streafe.HubExtended.player_utils.HubPlayer;
 import me.streafe.HubExtended.sql.SQL_Class;
 import me.streafe.HubExtended.utils.CustomSign;
+import me.streafe.HubExtended.utils.ItemContent;
 import me.streafe.HubExtended.utils.MenuListener;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 
@@ -35,6 +40,19 @@ public class HubExtended extends JavaPlugin {
     private Map<UUID,HubPlayer> hubPlayerList;
     private Scoreboard mainScoreboard;
 
+    @Override
+    public void onDisable(){
+        for(Player playersOnline : getServer().getOnlinePlayers()){
+            HBConfigSetup hbConfigSetup = new HBConfigSetup(playersOnline);
+            ItemContent itemContent = new ItemContent(playersOnline);
+
+            itemContent.savePlayerInventory(playersOnline);
+
+            playersOnline.getInventory().clear();
+        }
+    }
+
+    @Override
     public void onEnable(){
         instance = this;
         getConfig().options().copyDefaults(true);
@@ -71,6 +89,7 @@ public class HubExtended extends JavaPlugin {
         getCommand("luckychest").setExecutor(new lucky_chest_command());
 
         getCommand("help").setExecutor(new AllowedCommandsPerRank());
+        getCommand("oitc").setExecutor(new OITCCommand());
 
 
 
@@ -84,6 +103,21 @@ public class HubExtended extends JavaPlugin {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        }
+
+        for(Player playersOnline : getServer().getOnlinePlayers()){
+            try{
+                JoinListener.updateOnlinePlayers(playersOnline);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        for(Player playersOnline : getServer().getOnlinePlayers()){
+            HBConfigSetup hbConfigSetup = new HBConfigSetup(playersOnline);
+            ItemContent itemContent = new ItemContent(playersOnline);
+
+            playersOnline.getInventory().setContents(itemContent.getSavedPlayerInventory(hbConfigSetup.get("player.inventory")));
         }
     }
 

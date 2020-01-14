@@ -12,6 +12,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,8 +73,13 @@ public class Menu implements Listener {
         }
         rankItem.setItemMeta(rankMeta);
 
+        ItemStack gameSettings = utils.createNewItemWithMeta("","&7use this to acces the settings in game",Material.BOW,"&aGame Settings");
+
+
+
         inv.setItem(0,signEdit);
         inv.setItem(1,rankItem);
+        inv.setItem(2,gameSettings);
 
 
     }
@@ -97,6 +103,17 @@ public class Menu implements Listener {
 
         this.inv.setItem(0,openLuckyChestItem);
 
+    }
+
+    public void gameSettings(Player player){
+        this.inv = Bukkit.createInventory(null,size,name);
+        this.hubPlayer = HubExtended.getInstance().getHubPlayer(player.getUniqueId());
+
+        player.openInventory(this.inv);
+
+        for(int i = 0; i<size;i++){
+           this.inv.setItem(i,new ItemStack(Material.STAINED_GLASS_PANE));
+        }
     }
 
 

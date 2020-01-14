@@ -30,3 +30,5 @@ commands:
     default: true
   help:
     default: true
+  oitc:
+    default: op

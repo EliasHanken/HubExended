@@ -47,7 +47,10 @@ public class MenuListener implements Listener {
                 e.getWhoClicked().closeInventory();
             }else if((ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()).equalsIgnoreCase("rank"))){
                 e.setCancelled(true);
-
+            }else if((ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()).equalsIgnoreCase("Game Settings"))){
+                e.setCancelled(true);
+                Menu menu = new Menu("Game Settings",9);
+                menu.gameSettings(p);
             }
         }
 

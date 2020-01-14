@@ -90,7 +90,7 @@ public class MinigameCommand implements CommandExecutor {
 
                 else if(args.length == 2 && args[0].equalsIgnoreCase("settype")){
                     try{
-                        this.minigameType = MinigameType.valueOf(args[1]);
+                        this.minigameType = MinigameType.valueOf(args[1].toUpperCase());
                         HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).setType(this.minigameType);
                         player.sendMessage(utils.translate("&aGame type set to " + this.minigameType.getName()));
                     }catch (Exception e){

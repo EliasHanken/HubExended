@@ -100,18 +100,21 @@ public class AnimatedScoreboard {
                     ScoreboardScore list = new ScoreboardScore(board, obj, utils.translate("&7Player amount: &a") + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerAmount);
                     ScoreboardScore leave1 = new ScoreboardScore(board,obj,utils.translate("    &7in case you want to leave"));
                     ScoreboardScore leave2 = new ScoreboardScore(board,obj,utils.translate("    &7use &c&o/minigames leave"));
+                    ScoreboardScore gameState = new ScoreboardScore(board,obj,utils.translate("    &a"+HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).gameState.getName()));
 
                     header.setScore(8);
                     owner.setScore(7);
                     list.setScore(6);
                     leave1.setScore(5);
                     leave2.setScore(4);
+                    gameState.setScore(3);
 
                     PacketPlayOutScoreboardScore ps1 = new PacketPlayOutScoreboardScore(header);
                     PacketPlayOutScoreboardScore ps2 = new PacketPlayOutScoreboardScore(owner);
                     PacketPlayOutScoreboardScore ps3 = new PacketPlayOutScoreboardScore(list);
                     PacketPlayOutScoreboardScore ps4 = new PacketPlayOutScoreboardScore(leave1);
                     PacketPlayOutScoreboardScore ps5 = new PacketPlayOutScoreboardScore(leave2);
+                    PacketPlayOutScoreboardScore ps6 = new PacketPlayOutScoreboardScore(gameState);
 
                     PacketUtils.sendPacket(player, removepacket);
                     PacketUtils.sendPacket(player, createpacket);
@@ -122,6 +125,7 @@ public class AnimatedScoreboard {
                     PacketUtils.sendPacket(player, ps3);
                     PacketUtils.sendPacket(player, ps4);
                     PacketUtils.sendPacket(player, ps5);
+                    PacketUtils.sendPacket(player, ps6);
 
                     return;
                 } else if (!hubPlayer.isInGame()) {

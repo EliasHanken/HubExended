@@ -2,22 +2,23 @@ package me.streafe.HubExtended.minigames;
 
 import me.streafe.HubExtended.HubExtended;
 import me.streafe.HubExtended.player_utils.HubPlayer;
+import me.streafe.HubExtended.utils.FireworkUtil;
 import me.streafe.HubExtended.utils.PacketUtils;
 import me.streafe.HubExtended.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
+import org.bukkit.Sound;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.rmi.CORBA.Util;
 import java.util.*;
 
 public class Minigame implements Listener {
@@ -59,9 +60,19 @@ public class Minigame implements Listener {
 
             if(minigameType == MinigameType.OITC){
                 startOITC();
-                winner = HubExtended.getInstance().getHubPlayer(Bukkit.getPlayer("7b2a24f8-c3a9-41d0-8f18-4ada0c23e428").getUniqueId());
-                endGame();
+
+                MinigameCountdownTask task = new MinigameCountdownTask(0L,20L) {
+                    @Override
+                    public void run() {
+                        if(gameState == GameState.FINISHED){
+                            endGame();
+                            cancelTask();
+                        }
+                    }
+                };
             }
+
+
 
             OITCKit kit = new OITCKit();
             kit.setOITCInventory(Bukkit.getPlayer(players.getUUID()));
@@ -70,39 +81,104 @@ public class Minigame implements Listener {
     }
 
     @EventHandler
-    public void onPlayerHurt(EntityDamageByEntityEvent e){
+    public void onPlayerShootProjectile(EntityDamageByEntityEvent e){
 
-        HubPlayer hubPlayer = HubExtended.getInstance().getHubPlayer(e.getEntity().getUniqueId());
+        if(!(HubExtended.getInstance().getMinigameByID(HubExtended.getInstance().getHubPlayer(e.getEntity().getUniqueId()).getGameID()).minigameType == MinigameType.OITC)){
+            return;
+        }
+
+        if(!(e.getEntity() instanceof Player) || !(e.getDamager() instanceof Arrow)) return;
+
+        Entity entity = e.getEntity();
+        Arrow arrow = (Arrow) e.getDamager();
+
+        if(!(arrow.getShooter() instanceof Player)) return;
+
+        Player player = (Player) arrow.getShooter();
+
+        if(entity instanceof Player){
+            if(e.getDamager() instanceof Arrow){
+                arrow.remove();
+
+                /*
+                UUID uuid = e.getEntity().getUniqueId();
+
+                HubPlayer shooterH = HubExtended.getInstance().getHubPlayer(uuid);
+                HubPlayer hitPlayerH = HubExtended.getInstance().getHubPlayer(hitPlayer.getUniqueId());
+
+                 */
+                int getIndex = Utils.getRandomNumberInRange(1, Utils.getLocations().size() -1);
 
 
-            if(hubPlayer.inGame){
-                if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).gameState == GameState.STARTED){
-                    if(hubPlayer.gamePoints >= 1){
-                        gameEnd();
-                        gameState = GameState.FINISHED;
-                    }
-                    Player player = (Player) e.getEntity();
-                    Player damager = (Player) e.getDamager();
-                    damager.sendMessage(utils.translate("&aYou got one point for killing &c&o" + e.getEntity().getName()));
+                entity.teleport(Utils.getLocations().get(getIndex));
+                ((Player) entity).playSound(entity.getLocation(),Sound.CAT_PURREOW,1f,1f);
 
-                    damager.sendMessage("You have " + hubPlayer.gamePoints);
-                    hubPlayer.gamePoints += 1;
-
-
-                    player.teleport(HubExtended.getInstance().getLobbyLocation());
-                    player.setHealth(20);
-
-
-
-                }
-                else{
-
-                    e.setCancelled(true);
-                }
-            }else {
+                FireworkUtil fireworkUtil = new FireworkUtil(player,1);
+                fireworkUtil.spawnFireWork();
+                player.playSound(player.getLocation(), Sound.VILLAGER_YES,1f,1f);
 
                 e.setCancelled(true);
             }
+        }
+        /*
+        if(!shooterH.inGame && !hitPlayerH.inGame)return;
+        if(HubExtended.getInstance().getMinigameByID(shooterH.getGameID()).gameState != GameState.STARTED && HubExtended.getInstance().getMinigameByID(hitPlayerH.getGameID()).gameState != GameState.STARTED) return;
+
+        hitPlayer.teleport(HubExtended.getInstance().getLobbyLocation());
+        shooter.sendMessage(utils.translate("&+1 point for killing &c&o") + hitPlayer.getName() + "§a" + shooterH.gamePoints);
+        shooterH.gamePoints += 1;
+
+        if(shooterH.gamePoints >= 10){
+            gameState = GameState.FINISHED;
+        }
+
+         */
+    }
+
+    @EventHandler
+    public void onPlayerHurt(EntityDamageByEntityEvent e){
+
+        /*
+        if(!(e.getEntity() instanceof Player)){
+            if(e.getCause() != EntityDamageEvent.DamageCause.PROJECTILE)return;
+
+            Projectile projectile = (Projectile) e.getDamager();
+
+            if((projectile.getShooter() instanceof Player) && (e.getEntity() instanceof Player)){
+                ((Player) projectile.getShooter()).sendMessage(utils.translate("&a+1 point for killing &c&o"+e.getEntity()));
+
+                e.getEntity().teleport(HubExtended.getInstance().getLobbyLocation());
+            }
+        }
+         */
+        if(e.getDamager() instanceof Player){
+            HubPlayer hubPlayer = HubExtended.getInstance().getHubPlayer(e.getDamager().getUniqueId());
+
+            if(!hubPlayer.inGame){
+                e.setCancelled(true);
+                hubPlayer.sendMessage(utils.translate("&c(!) &7no pvp!"));
+                return;
+            }
+
+            if(hubPlayer.inGame){
+                if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).gameState == GameState.STARTED){
+                    e.setCancelled(false);
+                }
+                else{
+                    e.setCancelled(true);
+                    hubPlayer.sendMessage(utils.translate("&c(!) &7no pvp!"));
+                }
+            }
+        }else{
+            e.getDamager().remove();
+            e.setCancelled(true);
+        }
+
+
+
+
+
+
     }
 
     public void startOITC(){
@@ -136,16 +212,15 @@ public class Minigame implements Listener {
 
 
     public void endGame(){
-        for(HubPlayer players : playerList){
-            Bukkit.getPlayer(players.getUUID()).teleport(HubExtended.getInstance().getLobbyLocation());
-            PacketUtils.sendTitle(Bukkit.getPlayer(players.getUUID()),"&cGame End!", ChatColor.RED);
+        for(int i = 0; i < playerList.size(); i++){
+            playerList.get(i).sendMessage(utils.translate("&cGame End!"));
         }
         new BukkitRunnable() {
             @Override
             public void run() {
                 for(HubPlayer players : playerList){
                     Bukkit.getPlayer(players.getUUID()).teleport(HubExtended.getInstance().getLobbyLocation());
-                    PacketUtils.sendTitle(Bukkit.getPlayer(players.getUUID()),"&a"+winner.getName() + " won the game!", ChatColor.RED);
+                    PacketUtils.sendTitle(Bukkit.getPlayer(players.getUUID()),winner.getName() + " won the game!", ChatColor.RED);
                     gameState = GameState.LOBBY;
                     players.setInGame(false);
                 }
@@ -159,7 +234,8 @@ public class Minigame implements Listener {
     }
 
     public void removePlayer(Player player){
-        this.getPlayerList().remove(new HubPlayer(player));
+        this.getPlayerList().remove(HubExtended.getInstance().getHubPlayer(player.getUniqueId()));
+        playerAmount--;
     }
 
     public void setType(MinigameType type){

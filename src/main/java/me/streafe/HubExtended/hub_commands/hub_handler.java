@@ -14,7 +14,7 @@ public class hub_handler {
 
     }
 
-    public void handleHubPlayers(@org.jetbrains.annotations.NotNull Player p, @org.jetbrains.annotations.NotNull Long l){
+    public void handleHubPlayers(Player p, Long l){
         this.hubPlayer = HubExtended.getInstance().getHubPlayer(p.getUniqueId());
 
         BukkitScheduler scheduler = HubExtended.getInstance().getServer().getScheduler();
