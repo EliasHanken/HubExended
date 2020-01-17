@@ -7,13 +7,13 @@ public enum MinigameType {
     OITC("OITC"),
     FFA("FFA");
 
-    private String name;
+    String name;
 
     MinigameType(String name){
         this.name = name;
     }
 
-    String getName(){
+    public String getName(){
         return this.name;
     }
 

@@ -100,7 +100,8 @@ public class AnimatedScoreboard {
                     ScoreboardScore list = new ScoreboardScore(board, obj, utils.translate("&7Player amount: &a") + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerAmount);
                     ScoreboardScore leave1 = new ScoreboardScore(board,obj,utils.translate("    &7in case you want to leave"));
                     ScoreboardScore leave2 = new ScoreboardScore(board,obj,utils.translate("    &7use &c&o/minigames leave"));
-                    ScoreboardScore gameState = new ScoreboardScore(board,obj,utils.translate("    &a"+HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).gameState.getName()));
+                    ScoreboardScore gameState = new ScoreboardScore(board,obj,utils.translate("    &a"+HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).gameState.getName()) + utils.translate("  &7(&a" +
+                            HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).minigameType.getName() + "&7)" + " &aPOINTS "+hubPlayer.gamePoints));
 
                     header.setScore(8);
                     owner.setScore(7);

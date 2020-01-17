@@ -4,13 +4,22 @@ import me.streafe.HubExtended.HubExtended;
 import me.streafe.HubExtended.player_utils.HBConfigSetup;
 import me.streafe.HubExtended.player_utils.HubPlayer;
 import me.streafe.HubExtended.player_utils.RankEnum;
+import me.streafe.HubExtended.utils.TextBuilder;
 import me.streafe.HubExtended.utils.Utils;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.Arrays;
 
 
 public class SpeakListener implements Listener {
@@ -23,6 +32,8 @@ public class SpeakListener implements Listener {
 
     @EventHandler
     public void onPlayerSpeak(AsyncPlayerChatEvent e){
+
+
         e.setCancelled(true);
         this.message = e.getMessage();
         this.hubPlayer = HubExtended.getInstance().getHubPlayer(e.getPlayer().getUniqueId());

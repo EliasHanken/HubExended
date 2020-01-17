@@ -1,6 +1,8 @@
 package me.streafe.HubExtended.player_utils;
 
 import me.streafe.HubExtended.HubExtended;
+import me.streafe.HubExtended.gameAccessories.KillEffects;
+import me.streafe.HubExtended.minigames.Minigame;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -22,7 +24,8 @@ public class HubPlayer {
     public int wins;
     public double level;
     public String inventory;
-    public int gamePoints;
+    public int gamePoints = 0;
+    public KillEffects killEffect;
 
     public HubPlayer(Player player){
         this.player = player;
@@ -43,6 +46,19 @@ public class HubPlayer {
 
     public void sendMessage(String message){
         this.player.sendMessage(message);
+    }
+
+    public Minigame getGame(){
+        if(HubExtended.getInstance().getMinigameByID(gameID) == null){
+            return null;
+        }
+
+        else if(HubExtended.getInstance().getMinigameByID(gameID) != null){
+            return HubExtended.getInstance().getMinigameByID(gameID);
+        }
+
+        return null;
+
     }
 
     public void setSignEditEnable(boolean bool){

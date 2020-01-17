@@ -20,6 +20,7 @@ import me.streafe.HubExtended.sql.SQL_Class;
 import me.streafe.HubExtended.utils.CustomSign;
 import me.streafe.HubExtended.utils.ItemContent;
 import me.streafe.HubExtended.utils.MenuListener;
+import me.streafe.HubExtended.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -39,6 +40,7 @@ public class HubExtended extends JavaPlugin {
     public Map<String, Minigame> minigameHashMap;
     private Map<UUID,HubPlayer> hubPlayerList;
     private Scoreboard mainScoreboard;
+    private String nmsVersion;
 
     @Override
     public void onDisable(){
@@ -55,8 +57,15 @@ public class HubExtended extends JavaPlugin {
     @Override
     public void onEnable(){
         instance = this;
+        this.nmsVersion = getNmsVersion();
+        if(!this.nmsVersion.equalsIgnoreCase("v1_8_R3")){
+            getServer().getConsoleSender().sendMessage(Utils.translateInnerclass("&cDisabling HubExtended not v1_8_R3"));
+            getServer().getConsoleSender().sendMessage(Utils.translateInnerclass("&cYou need server to be running v1_8_R3"));
+            this.getServer().getPluginManager().disablePlugin(this);
+        }
         getConfig().options().copyDefaults(true);
         saveConfig();
+        getServer().getConsoleSender().sendMessage(Utils.translateInnerclass("&aRunning on spigot " + getNmsVersion()));
         getCommand("connect").setExecutor(new BungeeConnect());
         getCommand("msg").setExecutor(new BungeeMessage());
         getCommand("hub").setExecutor(new BungeeConnect());
@@ -96,14 +105,18 @@ public class HubExtended extends JavaPlugin {
         this.minigameHashMap = new HashMap<>();
         this.hubPlayerList = new HashMap<>();
 
-        this.sql_class = new SQL_Class(host,port,usr,pw,dbn);
-        try {
-            sql_class.connect();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        if(getConfig().getString("sql.enable").equalsIgnoreCase("true")){
+            this.sql_class = new SQL_Class(host,port,usr,pw,dbn);
+            try {
+                sql_class.connect();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }
+
+
 
         for(Player playersOnline : getServer().getOnlinePlayers()){
             try{
@@ -119,6 +132,8 @@ public class HubExtended extends JavaPlugin {
 
             playersOnline.getInventory().setContents(itemContent.getSavedPlayerInventory(hbConfigSetup.get("player.inventory")));
         }
+
+
     }
 
     public Location getHubLocation(){
@@ -145,6 +160,10 @@ public class HubExtended extends JavaPlugin {
 
     public static HubExtended getInstance(){
         return instance;
+    }
+
+    public String getNmsVersion(){
+        return this.getServer().getClass().getPackage().getName().replace(".",",").split(",")[3];
     }
 
     public Minigame getMinigameByID(String id){

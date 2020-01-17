@@ -162,6 +162,7 @@ public class MinigameCommand implements CommandExecutor {
 
                     if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getOwner() == player){
                         HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerAmount--;
+
                         for(HubPlayer partyPlayers : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerList){
                             partyPlayers.sendMessage(utils.translate("&7" + hubPlayer.getName() + " &cleft the party"));
                             HubExtended.getInstance().minigameHashMap.remove(partyPlayers.getGameID());

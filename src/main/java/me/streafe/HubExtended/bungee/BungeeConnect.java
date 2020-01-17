@@ -47,22 +47,27 @@ public class BungeeConnect implements CommandExecutor {
                         bListener.connectToServer(player,"hub");
                         this.cancel();
 
-                        try{
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    double x = HubExtended.getInstance().getConfig().getDouble("world.hubX");
-                                    double y = HubExtended.getInstance().getConfig().getDouble("world.hubY");
-                                    double z = HubExtended.getInstance().getConfig().getDouble("world.hubZ");
-                                    float pitch = (float) HubExtended.getInstance().getConfig().getDouble("world.hubPitch");
-                                    float yaw = (float) HubExtended.getInstance().getConfig().getDouble("world.hubYaw");
-                                    Location hubLoc = new Location(Bukkit.getWorld("world"),x,y,z,yaw,pitch);
-                                    player.teleport(hubLoc);
-                                }
-                            }.runTaskLaterAsynchronously(HubExtended.getInstance(),40L);
-                        }catch(Exception e){
-                            e.printStackTrace();
+                        if(!HubExtended.getInstance().getHubPlayer(player.getUniqueId()).inGame){
+                            try{
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        double x = HubExtended.getInstance().getConfig().getDouble("world.hubX");
+                                        double y = HubExtended.getInstance().getConfig().getDouble("world.hubY");
+                                        double z = HubExtended.getInstance().getConfig().getDouble("world.hubZ");
+                                        float pitch = (float) HubExtended.getInstance().getConfig().getDouble("world.hubPitch");
+                                        float yaw = (float) HubExtended.getInstance().getConfig().getDouble("world.hubYaw");
+                                        Location hubLoc = new Location(Bukkit.getWorld("world"),x,y,z,yaw,pitch);
+                                        player.teleport(hubLoc);
+                                    }
+                                }.runTaskLaterAsynchronously(HubExtended.getInstance(),40L);
+                            }catch(Exception e){
+                                e.printStackTrace();
+                            }
+                        }else{
+                            return;
                         }
+
 
 
 

@@ -1,9 +1,11 @@
 package me.streafe.HubExtended.minigames;
 
 import me.streafe.HubExtended.HubExtended;
+import me.streafe.HubExtended.gameAccessories.GameAccessoriesHandler;
 import me.streafe.HubExtended.player_utils.HubPlayer;
 import me.streafe.HubExtended.utils.FireworkUtil;
 import me.streafe.HubExtended.utils.PacketUtils;
+import me.streafe.HubExtended.utils.TextBuilder;
 import me.streafe.HubExtended.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -15,6 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -83,9 +86,14 @@ public class Minigame implements Listener {
     @EventHandler
     public void onPlayerShootProjectile(EntityDamageByEntityEvent e){
 
+        if(e.getEntity() instanceof Monster || e.getEntity() instanceof Animals) return;
+
+        if(HubExtended.getInstance().getMinigameByID( HubExtended.getInstance().getHubPlayer(e.getEntity().getUniqueId()).getGameID() ) == null)return;
+
         if(!(HubExtended.getInstance().getMinigameByID(HubExtended.getInstance().getHubPlayer(e.getEntity().getUniqueId()).getGameID()).minigameType == MinigameType.OITC)){
             return;
         }
+
 
         if(!(e.getEntity() instanceof Player) || !(e.getDamager() instanceof Arrow)) return;
 
@@ -97,8 +105,12 @@ public class Minigame implements Listener {
         Player player = (Player) arrow.getShooter();
 
         if(entity instanceof Player){
+            if(entity.getUniqueId() == ((Player) arrow.getShooter()).getUniqueId()){
+                entity.sendMessage(utils.translate("&cDon't shoot your self"));
+                return;
+            }
             if(e.getDamager() instanceof Arrow){
-                arrow.remove();
+
 
                 /*
                 UUID uuid = e.getEntity().getUniqueId();
@@ -107,16 +119,35 @@ public class Minigame implements Listener {
                 HubPlayer hitPlayerH = HubExtended.getInstance().getHubPlayer(hitPlayer.getUniqueId());
 
                  */
-                int getIndex = Utils.getRandomNumberInRange(1, Utils.getLocations().size() -1);
+                GameAccessoriesHandler gah = new GameAccessoriesHandler(player);
+                gah.playKillEffect(arrow.getLocation());
 
+                arrow.remove();
+
+                int getIndex = Utils.getRandomNumberInRange(1, Utils.getLocations().size() -1);
+                HubPlayer hubPlayerShooter = HubExtended.getInstance().getHubPlayer(player.getUniqueId());
+                hubPlayerShooter.gamePoints += 1;
+                hubPlayerShooter.sendMessage(utils.translate("&a[+1] &7for killing &o&a" + entity.getName()));
 
                 entity.teleport(Utils.getLocations().get(getIndex));
-                ((Player) entity).playSound(entity.getLocation(),Sound.CAT_PURREOW,1f,1f);
 
-                FireworkUtil fireworkUtil = new FireworkUtil(player,1);
-                fireworkUtil.spawnFireWork();
+                /*
+                if(hubPlayerShooter.gamePoints >= 1){
+                    hubPlayerShooter.getGame().winner = hubPlayerShooter;
+                    endGame();
+                }
+
+                 */
+
+                /*
+                ((Player) entity).playSound(entity.getLocation(),Sound.CAT_PURREOW,1f,1f);
+                 */
+
+                /*
                 player.playSound(player.getLocation(), Sound.VILLAGER_YES,1f,1f);
 
+
+                 */
                 e.setCancelled(true);
             }
         }
@@ -162,7 +193,17 @@ public class Minigame implements Listener {
 
             if(hubPlayer.inGame){
                 if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).gameState == GameState.STARTED){
-                    e.setCancelled(false);
+                    if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).minigameType == MinigameType.OITC){
+                        if(e.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK){
+                            e.setCancelled(true);
+                        }else{
+                            e.setCancelled(false);
+                        }
+                    }else{
+                        e.setCancelled(false);
+                    }
+
+
                 }
                 else{
                     e.setCancelled(true);
@@ -212,8 +253,8 @@ public class Minigame implements Listener {
 
 
     public void endGame(){
-        for(int i = 0; i < playerList.size(); i++){
-            playerList.get(i).sendMessage(utils.translate("&cGame End!"));
+        for(HubPlayer hubPlayers : playerList){
+            hubPlayers.sendMessage(utils.translate("&cGame End!"));
         }
         new BukkitRunnable() {
             @Override
@@ -223,6 +264,8 @@ public class Minigame implements Listener {
                     PacketUtils.sendTitle(Bukkit.getPlayer(players.getUUID()),winner.getName() + " won the game!", ChatColor.RED);
                     gameState = GameState.LOBBY;
                     players.setInGame(false);
+                    players.gamePoints = 0;
+
                 }
             }
         }.runTaskLaterAsynchronously(HubExtended.getInstance(),100L);

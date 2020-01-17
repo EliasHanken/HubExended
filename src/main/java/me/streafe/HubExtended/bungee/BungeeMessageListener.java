@@ -5,6 +5,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.sun.javafx.iio.ios.IosDescriptor;
 import me.streafe.HubExtended.HubExtended;
+import me.streafe.HubExtended.player_utils.HubPlayer;
 import me.streafe.HubExtended.utils.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
@@ -36,6 +37,11 @@ public class BungeeMessageListener implements PluginMessageListener {
     }
 
     public void connectToServer(Player player, String server){
+        HubPlayer hubPlayer = HubExtended.getInstance().getHubPlayer(player.getUniqueId());
+        if(hubPlayer.inGame){
+            player.sendMessage(Utils.translateInnerclass("&cYou are in game, use /minigames leave"));
+            return;
+        }
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Connect");
         out.writeUTF(server);

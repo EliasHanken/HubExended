@@ -22,7 +22,7 @@ public class menu_command implements CommandExecutor {
             if(cmd.getName().equalsIgnoreCase("settings")){
                 Bukkit.getWorld(p.getLocation().getWorld().getName()).playSound(p.getLocation(), Sound.LEVEL_UP, 1f,1f);
 
-                Menu settings = new Menu("Settings",18);
+                Menu settings = new Menu("Settings",36);
                 settings.settingsMenu(p);
             }
         }

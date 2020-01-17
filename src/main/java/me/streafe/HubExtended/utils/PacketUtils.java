@@ -3,6 +3,7 @@ package me.streafe.HubExtended.utils;
 
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
@@ -34,5 +35,8 @@ public class PacketUtils {
         sendPacket(player,title);
         sendPacket(player,length);
 
+    }
+
+    public static void sendPlayerSound(Player player){
     }
 }

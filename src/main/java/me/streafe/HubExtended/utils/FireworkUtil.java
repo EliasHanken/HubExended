@@ -5,11 +5,13 @@ import me.streafe.HubExtended.player_utils.HubPlayer;
 import net.minecraft.server.v1_8_R3.EntityFireworks;
 import net.minecraft.server.v1_8_R3.ItemStack;
 import net.minecraft.server.v1_8_R3.Items;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -21,11 +23,31 @@ public class FireworkUtil {
     private Player player;
     private HubPlayer hubPlayer;
     private int height;
+    private Entity entity;
 
     public FireworkUtil(Player player, int maxHeight){
         this.player = player;
         this.hubPlayer = HubExtended.getInstance().getHubPlayer(player.getUniqueId());
-        this.height = height;
+        this.height = maxHeight;
+    }
+
+    public static FireworkEffect getRandomExplosion() {
+        FireworkEffect.Builder fwB = FireworkEffect.builder();
+        Random r = new Random();
+        fwB.flicker(r.nextBoolean());
+        fwB.trail(r.nextBoolean());
+        fwB.with(FireworkEffect.Type.BALL);
+        fwB.withColor(Color.fromRGB(r.nextInt(256), r.nextInt(256), r.nextInt(256)));
+        fwB.withFade(Color.fromRGB(r.nextInt(256), r.nextInt(256), r.nextInt(256)));
+        FireworkEffect fe = fwB.build();
+        return fe;
+    }
+
+    private static Class<?> getClass(String prefix, String nmsClassString) throws ClassNotFoundException {
+        String version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3] + ".";
+        String name = prefix + version + nmsClassString;
+        Class<?> nmsClass = Class.forName(name);
+        return nmsClass;
     }
 
     public void spawnFireWork(){

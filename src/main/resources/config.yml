@@ -1,4 +1,6 @@
 sql:
+  #reloading plugin time increases by 4seconds
+  enable: 'false'
   host: 'localhost'
   port: 3306
   password: ''
@@ -6,7 +8,9 @@ sql:
   username: 'root'
 system:
   chatFormat: ''
+  #plugin_prefix not really in use
   plugin_prefix: '&7[&dHubExtended v1.0&7] &r'
+  #Havent taken the time to fix just showing + when join and leave but different colors.
   join_message: '&7[&a+&7] '
   leave_message: '&7[&c-&7] '
 players:
@@ -15,5 +19,22 @@ minigames:
     items:
       bow:
         name: '&aOne shot one kill'
+HEART_EXPLOSION:
+  offset-x: 0.7
+  offset-y: 0.5
+  offset-z: 0.7
+  add-x: 0
+  add-y: 1
+  add-z: 0
+  speed: 0.1
+HEAD_ROCKET:
+  add-yaw: 10
+  add-y: 0.5
+  duration: 20
+FINAL_SMASH:
+  add-yaw: 20
+  add-y: 0.2
+  duration: 60
+  duration-turn: 20
 
 

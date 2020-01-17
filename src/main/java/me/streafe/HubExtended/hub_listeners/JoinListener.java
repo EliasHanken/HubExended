@@ -1,10 +1,12 @@
 package me.streafe.HubExtended.hub_listeners;
 
 import me.streafe.HubExtended.HubExtended;
+import me.streafe.HubExtended.gameAccessories.GameAccessoriesHandler;
 import me.streafe.HubExtended.hub_commands.hub_handler;
 import me.streafe.HubExtended.minigames.GameState;
 import me.streafe.HubExtended.player_utils.*;
 import me.streafe.HubExtended.utils.AnimatedScoreboard;
+import me.streafe.HubExtended.utils.TextBuilder;
 import me.streafe.HubExtended.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -35,7 +37,7 @@ public class JoinListener implements Listener {
         hbConfigSetup.setHubPlayer();
 
         e.setJoinMessage("");
-        Bukkit.getServer().broadcastMessage((utils.translate(HubExtended.getInstance().getConfig().get("system.join_message").toString()) + RankEnum.valueOf(hbConfigSetup.get("player.rank")).getPrefix() + " " + p.getName()));
+        Bukkit.getServer().broadcastMessage((utils.translate(HubExtended.getInstance().getConfig().getString("system.join_message")) + RankEnum.valueOf(hbConfigSetup.get("player.rank")).getPrefix() + " " + p.getName()));
 
         UpdatePlayerRun updatePlayerRun = new UpdatePlayerRun();
 
@@ -50,6 +52,9 @@ public class JoinListener implements Listener {
 
         hub_handler hubH = new hub_handler();
         hubH.handleHubPlayers(p,20L);
+
+        p.getInventory().setItem(1,Utils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTRkNDliYWU5NWM3OTBjM2IxZmY1YjJmMDEwNTJhNzE0ZDYxODU0ODFkNWIxYzg1OTMwYjNmOTlkMjMyMTY3NCJ9fX0=","&a&lSettings"));
+
 
     }
 
@@ -76,6 +81,7 @@ public class JoinListener implements Listener {
 
         hub_handler hubH = new hub_handler();
         hubH.handleHubPlayers(p,20L);
+
     }
 
     public static HBConfigSetup getHbConfigSetup(){
@@ -86,25 +92,30 @@ public class JoinListener implements Listener {
     public void onPlayerLeave(PlayerQuitEvent event){
         Player player = event.getPlayer();
 
+        player.getInventory().clear();
+
         if(HubExtended.getInstance().getHubPlayer(player.getUniqueId()) == null)return;
         HubPlayer hubPlayer = HubExtended.getInstance().getHubPlayer(player.getUniqueId());
 
         event.setQuitMessage("");
-        Bukkit.getServer().broadcastMessage((utils.translate(HubExtended.getInstance().getConfig().get("system.leave_message").toString()) + RankEnum.valueOf(hbConfigSetup.get("player.rank")).getPrefix() + " " + player.getName()));
+        Bukkit.getServer().broadcastMessage((utils.translate(HubExtended.getInstance().getConfig().getString("system.leave_message")) + RankEnum.valueOf(hbConfigSetup.get("player.rank")).getPrefix() + " " + player.getName()));
 
 
         if(!hubPlayer.isInGame()){
             return;
         }
 
-            HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).removePlayer(player);
+
 
             for(HubPlayer partyPlayers : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerList) {
                 partyPlayers.sendMessage(utils.translate("&7" + hubPlayer.getName() + " &cleft the party"));
             }
 
-            HubExtended.getInstance().getHubPlayerList().remove(hubPlayer);
+
             HubExtended.getInstance().getLogger().info(utils.translate("&cRemoved HubPlayer ") + player.getName());
+
+            HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).removePlayer(player);
+        HubExtended.getInstance().getHubPlayerList().remove(hubPlayer);
     }
 
     @EventHandler

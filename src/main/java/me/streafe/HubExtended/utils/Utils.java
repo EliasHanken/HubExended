@@ -1,5 +1,7 @@
 package me.streafe.HubExtended.utils;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import me.streafe.HubExtended.HubExtended;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
@@ -7,17 +9,26 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 public class Utils {
 
     public String translate(String string){
+        return ChatColor.translateAlternateColorCodes('&',string);
+    }
+
+    public static String translateInnerclass(String string){
         return ChatColor.translateAlternateColorCodes('&',string);
     }
 
@@ -46,7 +57,7 @@ public class Utils {
         return item;
     }
 
-    public ItemStack createNewItemWithMeta(String line1C, String line2C, Material material, String displayName){
+    public ItemStack createNewItemWithMeta(String line1C, String line2C, Material material, String displayName, Enchantment enchantment){
         ItemStack itemStack = new ItemStack(material);
         ItemMeta meta = itemStack.getItemMeta();
         List<String> list = new ArrayList<>();
@@ -55,6 +66,8 @@ public class Utils {
 
         meta.setDisplayName(this.translate(displayName));
         meta.setLore(list);
+        meta.addEnchant(enchantment,1,true);
+        meta.getItemFlags().add(ItemFlag.HIDE_ATTRIBUTES);
 
         itemStack.setItemMeta(meta);
 
@@ -96,5 +109,51 @@ public class Utils {
 
         Random r = new Random();
         return r.nextInt((max - min) + 1) + min;
+    }
+
+    public static ItemStack getCustomTextureHead(String value,String displayName) {
+        ItemStack head = new ItemStack(Material.SKULL_ITEM, 1, (short)3);
+        SkullMeta meta = (SkullMeta) head.getItemMeta();
+        meta.setDisplayName(translateInnerclass(displayName));
+        GameProfile profile = new GameProfile(UUID.randomUUID(), "");
+        profile.getProperties().put("textures", new Property("textures", value));
+        Field profileField;
+        try {
+            profileField = meta.getClass().getDeclaredField("profile");
+            profileField.setAccessible(true);
+            profileField.set(meta, profile);
+        } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+            e.printStackTrace();
+        }
+        head.setItemMeta(meta);
+        return head;
+    }
+
+    public static ItemStack getCustomTextureHead(String value,String displayName,String line1, String line2, String line3, String line4, String line5) {
+        ItemStack head = new ItemStack(Material.SKULL_ITEM, 1, (short)3);
+        SkullMeta meta = (SkullMeta) head.getItemMeta();
+        meta.setDisplayName(translateInnerclass(displayName));
+
+        List<String> list = new ArrayList<>();
+        list.add(translateInnerclass(line1));
+        list.add(translateInnerclass(line2));
+        list.add(translateInnerclass(line3));
+        list.add(translateInnerclass(line4));
+        list.add(translateInnerclass(line5));
+
+        meta.setLore(list);
+
+        GameProfile profile = new GameProfile(UUID.randomUUID(), "");
+        profile.getProperties().put("textures", new Property("textures", value));
+        Field profileField;
+        try {
+            profileField = meta.getClass().getDeclaredField("profile");
+            profileField.setAccessible(true);
+            profileField.set(meta, profile);
+        } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+            e.printStackTrace();
+        }
+        head.setItemMeta(meta);
+        return head;
     }
 }

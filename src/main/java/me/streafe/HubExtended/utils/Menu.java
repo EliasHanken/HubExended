@@ -1,10 +1,13 @@
 package me.streafe.HubExtended.utils;
 
 import me.streafe.HubExtended.HubExtended;
+import me.streafe.HubExtended.gameAccessories.KillEffects;
+import me.streafe.HubExtended.player_utils.HBConfigSetup;
 import me.streafe.HubExtended.player_utils.HubPlayer;
 import me.streafe.HubExtended.player_utils.RankEnum;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -73,13 +76,17 @@ public class Menu implements Listener {
         }
         rankItem.setItemMeta(rankMeta);
 
-        ItemStack gameSettings = utils.createNewItemWithMeta("","&7use this to acces the settings in game",Material.BOW,"&aGame Settings");
+        ItemStack gameSettings = utils.createNewItemWithMeta("","&7use this to acces the settings in game",Material.BOW,"&aGame Settings", Enchantment.ARROW_INFINITE);
+
+        for (int i = 0; i<inv.getSize();i++){
+            inv.setItem(i,utils.createItem("&c|",Material.STAINED_GLASS_PANE));
+        }
 
 
-
-        inv.setItem(0,signEdit);
-        inv.setItem(1,rankItem);
-        inv.setItem(2,gameSettings);
+        inv.setItem(11,signEdit);
+        inv.setItem(13,rankItem);
+        inv.setItem(15,gameSettings);
+        inv.setItem(31,utils.createItem("&cBack",Material.BED));
 
 
     }
@@ -112,9 +119,53 @@ public class Menu implements Listener {
         player.openInventory(this.inv);
 
         for(int i = 0; i<size;i++){
-           this.inv.setItem(i,new ItemStack(Material.STAINED_GLASS_PANE));
+           this.inv.setItem(i,utils.createItem("&c|",Material.STAINED_GLASS_PANE));
+        }
+
+        inv.setItem(11,Utils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzIxOTYxNjQyZDk4Y2I4MDFhMTc2MDhiYTRhMjMyOTc3YjQ2MmVmNjY3OWI5NzhjOWJiNjQ5NWQxNTE2MjczIn19fQ=="
+                ,"&a&lKill Effects"));
+
+        inv.setItem(13,Utils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmE3MThlZjc3ODJlNzRmMWRjNDQ1OWYyYmUzYTE0ZjRlMDc1NGNkODdkOGMxNGFmNDQxZGE1ODE1OWEifX19"
+                ,"&6&lVictory Dances"));
+
+        inv.setItem(15,Utils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTE1OTk5MTI5Mjk3N2Y1YTQ3YjFlNTk4NGFkYTM4MTBlOWY4YWMwNWViM2UzZTc0MzAzNmUwMzM5OTVhMjM0MyJ9fX0="
+                ,"&8&lDeath Noises"));
+
+        inv.setItem(31,utils.createItem("&cBack",Material.BED));
+    }
+
+    public void killEffects(Player player){
+        this.inv = Bukkit.createInventory(null,36,"Kill Effects");
+        this.hubPlayer = HubExtended.getInstance().getHubPlayer(player.getUniqueId());
+
+
+        player.openInventory(this.inv);
+
+        inv.setItem(31,utils.createItem("&cBack",Material.BED));
+
+        inv.setItem(35,utils.createItem("&cNONE",Material.BARRIER));
+
+
+
+
+
+        for(int i = 0; i<9;i++){
+            this.inv.setItem(i,utils.createItem("&c&o&ksecret",Material.STAINED_GLASS_PANE));
+        }
+
+        HBConfigSetup hbConfigSetup = new HBConfigSetup(player);
+        inv.setItem(34,hbConfigSetup.getKillEffectItem(KillEffects.valueOf(hbConfigSetup.get("player.killEffectInUse"))));
+
+        if(!(hbConfigSetup.getAllKillEffectsItems() == null)){
+            for(int i = 0; i < hbConfigSetup.getKillEffectSize(); i++){
+                inv.setItem(i,hbConfigSetup.getAllKillEffectsItems().get(i));
+            }
+        }else {
+            return;
         }
     }
+
+
 
 
 }
