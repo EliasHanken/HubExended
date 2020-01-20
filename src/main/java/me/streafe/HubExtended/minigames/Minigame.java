@@ -2,21 +2,21 @@ package me.streafe.HubExtended.minigames;
 
 import me.streafe.HubExtended.HubExtended;
 import me.streafe.HubExtended.gameAccessories.GameAccessoriesHandler;
+import me.streafe.HubExtended.player_utils.HBConfigSetup;
 import me.streafe.HubExtended.player_utils.HubPlayer;
 import me.streafe.HubExtended.utils.FireworkUtil;
 import me.streafe.HubExtended.utils.PacketUtils;
 import me.streafe.HubExtended.utils.TextBuilder;
 import me.streafe.HubExtended.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -38,6 +38,8 @@ public class Minigame implements Listener {
     public HubPlayer winner;
     private Map<UUID, ItemStack[]> playerInv;
     public Map<UUID,Integer> playerScores;
+    public int skywarsPlayersAlive;
+    public List<UUID> skywarsPlayers;
 
     Utils utils = new Utils();
 
@@ -48,38 +50,85 @@ public class Minigame implements Listener {
         this.setType(type);
         this.setMaxPlayers(maxPlayers);
         this.minigameType = type;
+        playerList = new ArrayList<>();
+        skywarsPlayers = new ArrayList<>();
     }
 
     public Minigame(){
 
     }
 
+
+
     public void startGame(){
-        for(HubPlayer players : playerList){
+
+        for(HubPlayer players : getPlayerList()) {
             this.gameState = GameState.STARTED;
             players.setInGame(true);
             players.gamePoints = 0;
-            PacketUtils.sendTitle(Bukkit.getPlayer(players.getUUID()),"Game started " + utils.translate("&7"+minigameType), ChatColor.GREEN);
+            PacketUtils.sendTitle(Bukkit.getPlayer(players.getUUID()), "Game started " + utils.translate("&7" + minigameType), ChatColor.GREEN);
+        }
 
             if(minigameType == MinigameType.OITC){
+                OITCKit kit = new OITCKit();
                 startOITC();
+                for(HubPlayer players : getPlayerList()){
+                    kit.setOITCInventory(Bukkit.getPlayer(players.getUUID()));
+                }
 
-                MinigameCountdownTask task = new MinigameCountdownTask(0L,20L) {
-                    @Override
-                    public void run() {
-                        if(gameState == GameState.FINISHED){
-                            endGame();
-                            cancelTask();
-                        }
-                    }
-                };
+            }
+
+            else if(minigameType == MinigameType.SKYWARS){
+
+                for(int i = 0; i<playerAmount;i++){
+                    skywarsPlayers.add(getPlayerList().get(i).getUUID());
+                    skywarsPlayersAlive+=1;
+                }
+                this.gameState = GameState.STARTED;
+                for(HubPlayer players : getPlayerList()){
+                    players.setInGame(true);
+                    players.gamePoints = 0;
+                    PacketUtils.sendTitle(Bukkit.getPlayer(players.getUUID()),"Game started " + utils.translate("&7"+minigameType), ChatColor.GREEN);
+
+                }
+                startSkyWars();
             }
 
 
 
-            OITCKit kit = new OITCKit();
-            kit.setOITCInventory(Bukkit.getPlayer(players.getUUID()));
 
+    }
+
+
+    @EventHandler
+    public void damage(PlayerDeathEvent ev){
+        if(ev.getEntity() != null){
+
+            if((HubExtended.getInstance().getMinigameByID(HubExtended.getInstance().getHubPlayer(ev.getEntity().getUniqueId()).getGameID()).minigameType == MinigameType.SKYWARS)) {
+                GameAccessoriesHandler gah = new GameAccessoriesHandler(ev.getEntity().getKiller());
+                gah.playKillEffect(ev.getEntity().getLocation().add(0, 1, 0));
+
+                HubPlayer hubPlayer = HubExtended.getInstance().getHubPlayer(ev.getEntity().getUniqueId());
+                skywarsPlayers.remove(hubPlayer.getUUID());
+                skywarsPlayersAlive-=1;
+
+                HubPlayer hubPlayerKiller = HubExtended.getInstance().getHubPlayer(ev.getEntity().getKiller().getUniqueId());
+                hubPlayerKiller.gamePoints += 1;
+
+            }
+        }
+
+
+    }
+
+    @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent e){
+        if((HubExtended.getInstance().getMinigameByID(HubExtended.getInstance().getHubPlayer(e.getPlayer().getUniqueId()).getGameID()).minigameType == MinigameType.SKYWARS)){
+            if(!(HubExtended.getInstance().getMinigameByID(HubExtended.getInstance().getHubPlayer(e.getPlayer().getUniqueId()).getGameID()).gameState == GameState.LOBBY)){
+                e.getPlayer().teleport(HubExtended.getInstance().getLobbyLocation());
+            }else{
+                e.getPlayer().setGameMode(GameMode.ADVENTURE);
+            }
         }
     }
 
@@ -90,26 +139,24 @@ public class Minigame implements Listener {
 
         if(HubExtended.getInstance().getMinigameByID( HubExtended.getInstance().getHubPlayer(e.getEntity().getUniqueId()).getGameID() ) == null)return;
 
-        if(!(HubExtended.getInstance().getMinigameByID(HubExtended.getInstance().getHubPlayer(e.getEntity().getUniqueId()).getGameID()).minigameType == MinigameType.OITC)){
-            return;
-        }
 
 
-        if(!(e.getEntity() instanceof Player) || !(e.getDamager() instanceof Arrow)) return;
+        if((HubExtended.getInstance().getMinigameByID(HubExtended.getInstance().getHubPlayer(e.getEntity().getUniqueId()).getGameID()).minigameType == MinigameType.OITC)){
+            if(!(e.getEntity() instanceof Player) || !(e.getDamager() instanceof Arrow)) return;
 
-        Entity entity = e.getEntity();
-        Arrow arrow = (Arrow) e.getDamager();
+            Entity entity = e.getEntity();
+            Arrow arrow = (Arrow) e.getDamager();
 
-        if(!(arrow.getShooter() instanceof Player)) return;
+            if(!(arrow.getShooter() instanceof Player)) return;
 
-        Player player = (Player) arrow.getShooter();
+            Player player = (Player) arrow.getShooter();
 
-        if(entity instanceof Player){
-            if(entity.getUniqueId() == ((Player) arrow.getShooter()).getUniqueId()){
-                entity.sendMessage(utils.translate("&cDon't shoot your self"));
-                return;
-            }
-            if(e.getDamager() instanceof Arrow){
+            if(entity instanceof Player){
+                if(entity.getUniqueId() == ((Player) arrow.getShooter()).getUniqueId()){
+                    entity.sendMessage(utils.translate("&cDon't shoot your self"));
+                    return;
+                }
+                if(e.getDamager() instanceof Arrow){
 
 
                 /*
@@ -119,17 +166,17 @@ public class Minigame implements Listener {
                 HubPlayer hitPlayerH = HubExtended.getInstance().getHubPlayer(hitPlayer.getUniqueId());
 
                  */
-                GameAccessoriesHandler gah = new GameAccessoriesHandler(player);
-                gah.playKillEffect(arrow.getLocation());
+                    GameAccessoriesHandler gah = new GameAccessoriesHandler(player);
+                    gah.playKillEffect(arrow.getLocation());
 
-                arrow.remove();
+                    arrow.remove();
 
-                int getIndex = Utils.getRandomNumberInRange(1, Utils.getLocations().size() -1);
-                HubPlayer hubPlayerShooter = HubExtended.getInstance().getHubPlayer(player.getUniqueId());
-                hubPlayerShooter.gamePoints += 1;
-                hubPlayerShooter.sendMessage(utils.translate("&a[+1] &7for killing &o&a" + entity.getName()));
+                    int getIndex = Utils.getRandomNumberInRange(1, Utils.getLocations().size() -1);
+                    HubPlayer hubPlayerShooter = HubExtended.getInstance().getHubPlayer(player.getUniqueId());
+                    hubPlayerShooter.gamePoints += 1;
+                    hubPlayerShooter.sendMessage(utils.translate("&a[+1] &7for killing &o&a" + entity.getName()));
 
-                entity.teleport(Utils.getLocations().get(getIndex));
+                    entity.teleport(Utils.getLocations().get(getIndex));
 
                 /*
                 if(hubPlayerShooter.gamePoints >= 1){
@@ -148,9 +195,13 @@ public class Minigame implements Listener {
 
 
                  */
-                e.setCancelled(true);
+                    e.setCancelled(true);
+                }
             }
         }
+
+
+
         /*
         if(!shooterH.inGame && !hitPlayerH.inGame)return;
         if(HubExtended.getInstance().getMinigameByID(shooterH.getGameID()).gameState != GameState.STARTED && HubExtended.getInstance().getMinigameByID(hitPlayerH.getGameID()).gameState != GameState.STARTED) return;
@@ -226,22 +277,44 @@ public class Minigame implements Listener {
         MinigameCountdownTask oitc = new MinigameCountdownTask(0L,10L) {
             @Override
             public void run() {
-                if(gameState == GameState.FINISHED){
 
+                if(winner != null){
                     endGame();
+                    gameState = GameState.LOBBY;
                     cancelTask();
                 }
 
-                if(winner != null){
-                    gameState = GameState.FINISHED;
-                }
-
-                for(HubPlayer hubPlayers : playerList){
-                    if(hubPlayers.gamePoints >= 1){
+                for(int i = 0; i < playerAmount ; i++){
+                    HubPlayer hubPlayers = playerList.get(i);
+                    if(hubPlayers.gamePoints >= 25){
                         winner = hubPlayers;
-                        gameState = GameState.FINISHED;
+                        HBConfigSetup hbConfigSetup = new HBConfigSetup(hubPlayers.getPlayer());
+                        hbConfigSetup.editString("player.wins",hubPlayers.wins + 1);
                     }
                 }
+
+
+            }
+        };
+    }
+
+    public void startSkyWars(){
+        MinigameCountdownTask skywars = new MinigameCountdownTask(0L,10L) {
+            @Override
+            public void run() {
+
+                if(winner != null){
+                    endGame();
+                    gameState = GameState.LOBBY;
+                    cancelTask();
+                }
+
+                if(skywarsPlayersAlive <= 1){
+                    winner = HubExtended.getInstance().getHubPlayer(skywarsPlayers.get(0));
+                    HBConfigSetup hbConfigSetup = new HBConfigSetup(winner.getPlayer());
+                    hbConfigSetup.editString("player.wins",hbConfigSetup.getInt("player.wins") + 1);
+                }
+
             }
         };
     }
@@ -253,26 +326,34 @@ public class Minigame implements Listener {
 
 
     public void endGame(){
-        for(HubPlayer hubPlayers : playerList){
-            hubPlayers.sendMessage(utils.translate("&cGame End!"));
+        for(int i = 0; i<playerAmount;i++){
+            getPlayerList().get(i).sendMessage(utils.translate("&cGame End!"));
         }
         new BukkitRunnable() {
             @Override
             public void run() {
-                for(HubPlayer players : playerList){
+                for(HubPlayer players : getPlayerList()){
                     Bukkit.getPlayer(players.getUUID()).teleport(HubExtended.getInstance().getLobbyLocation());
-                    PacketUtils.sendTitle(Bukkit.getPlayer(players.getUUID()),winner.getName() + " won the game!", ChatColor.RED);
+                    String winnerPlayer;
+                    if(winner != null){
+                       winnerPlayer = winner.getName();
+                    }else{
+                        winnerPlayer = "?";
+                    }
+                    PacketUtils.sendTitle(Bukkit.getPlayer(players.getUUID()),winnerPlayer + " won the game!", ChatColor.RED);
                     gameState = GameState.LOBBY;
-                    players.setInGame(false);
+                    players.setInGame(true);
                     players.gamePoints = 0;
-
+                    players.getPlayer().getInventory().clear();
+                    winner = null;
+                    skywarsPlayersAlive = 0;
                 }
             }
-        }.runTaskLaterAsynchronously(HubExtended.getInstance(),100L);
+        }.runTaskLaterAsynchronously(HubExtended.getInstance(),1L);
     }
 
     public void addNewPlayer(Player player){
-        this.getPlayerList().add(new HubPlayer(player));
+        this.getPlayerList().add(HubExtended.getInstance().getHubPlayer(player.getUniqueId()));
         playerAmount++;
     }
 
@@ -319,8 +400,8 @@ public class Minigame implements Listener {
         return null;
     }
 
-    public List<HubPlayer> getPlayerList(){
-        return playerList;
+    public ArrayList<HubPlayer> getPlayerList(){
+        return (ArrayList<HubPlayer>) this.playerList;
     }
 
     public List<String> getPlayerListString(){

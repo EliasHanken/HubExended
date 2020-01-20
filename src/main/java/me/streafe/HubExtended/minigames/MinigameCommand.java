@@ -101,12 +101,17 @@ public class MinigameCommand implements CommandExecutor {
                 else if(args.length == 3 && args[0].equalsIgnoreCase("join")){
                     if(args[1].equalsIgnoreCase("player")){
                         HubPlayer joinTarget = HubExtended.getInstance().getHubPlayer(Bukkit.getPlayer(args[2]).getUniqueId());
+                        if(hubPlayer.inGame){
+                            hubPlayer.sendMessage(utils.translate("&cyou are already in game"));
+                            return true;
+                        }
                         if(!(HubExtended.getInstance().getMinigameByID(joinTarget.gameID) == null)){
                             HubExtended.getInstance().getMinigameByID(joinTarget.gameID).addNewPlayer(player);
                             player.sendMessage(utils.getPluginPrefix() + "you joined the game with ID: " + joinTarget.getGameID());
                             hubPlayer.setGameID(joinTarget.gameID);
                             hubPlayer.sendMessage("Your game id is: " + hubPlayer.getGameID());
                             hubPlayer.setInGame(true);
+
 
                             ItemContent itemContent = new ItemContent(player);
                             itemContent.savePlayerInventory(player);
@@ -128,7 +133,7 @@ public class MinigameCommand implements CommandExecutor {
                         hubPlayer.sendMessage(utils.getPluginPrefix() + "&cYou are already in this game");
                         return true;
                     }
-                    else if(HubExtended.getInstance().getHubPlayer(player.getUniqueId()).isInGame()){
+                    else if(HubExtended.getInstance().getHubPlayer(player.getUniqueId()).inGame){
                         hubPlayer.sendMessage(utils.getPluginPrefix() + utils.translate("&cYou are already in a game"));
                         return true;
                     }
@@ -162,8 +167,7 @@ public class MinigameCommand implements CommandExecutor {
 
                     if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getOwner() == player){
                         HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerAmount--;
-
-                        for(HubPlayer partyPlayers : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerList){
+                        for(HubPlayer partyPlayers : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getPlayerList()){
                             partyPlayers.sendMessage(utils.translate("&7" + hubPlayer.getName() + " &cleft the party"));
                             HubExtended.getInstance().minigameHashMap.remove(partyPlayers.getGameID());
 
@@ -175,8 +179,12 @@ public class MinigameCommand implements CommandExecutor {
                             partyPlayers.sendMessage(utils.getPluginPrefix() + "You left the gameparty");
 
                              */
-                            if(partyPlayers.inGame){
+                            if(!partyPlayers.inGame){
                                 partyPlayers.getPlayer().teleport(HubExtended.getInstance().getHubLocation());
+
+                                HBConfigSetup hbConfigSetup = new HBConfigSetup(Bukkit.getPlayer(partyPlayers.getUUID()));
+                                ItemContent itemContent = new ItemContent(Bukkit.getPlayer(partyPlayers.getUUID()));
+                                Bukkit.getPlayer(partyPlayers.getUUID()).getInventory().setContents(itemContent.getSavedPlayerInventory(hbConfigSetup.get("player.inventory")));
                             }
 
 
@@ -216,7 +224,6 @@ public class MinigameCommand implements CommandExecutor {
                             }
                         }
                         HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).removePlayer(player);
-                        HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerAmount--;
                         hubPlayer.setInGame(false);
                         hubPlayer.setGameID("");
 
@@ -237,6 +244,11 @@ public class MinigameCommand implements CommandExecutor {
                         if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerAmount < 2){
                             player.sendMessage(utils.translate("&cYou are less than 2 players in the party!"));
                             player.sendMessage(utils.translate("&cWant to start it anyway? Do /minigames startanyway"));
+                            return true;
+                        }
+                        else if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).gameState != GameState.LOBBY){
+                            HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getOwner().sendMessage(utils.translate("&cGame already started"));
+                            HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).endGame();
                             return true;
                         }
                         for(HubPlayer players : HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getPlayerList()){

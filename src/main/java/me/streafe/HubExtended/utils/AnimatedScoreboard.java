@@ -3,6 +3,7 @@ package me.streafe.HubExtended.utils;
 import me.streafe.HubExtended.HubExtended;
 import me.streafe.HubExtended.bungee.BungeeMessageListener;
 import me.streafe.HubExtended.minigames.MinigameCountdownTask;
+import me.streafe.HubExtended.minigames.MinigameType;
 import me.streafe.HubExtended.player_utils.HBConfigSetup;
 import me.streafe.HubExtended.player_utils.HubPlayer;
 import net.minecraft.server.v1_8_R3.*;
@@ -74,7 +75,7 @@ public class AnimatedScoreboard {
         MinigameCountdownTask updateScoreTask = new MinigameCountdownTask(0L, 20L) {
             @Override
             public void run() {
-                if (hubPlayer.isInGame()) {
+                if (hubPlayer.isInGame() && hubPlayer.getGame().minigameType == MinigameType.OITC) {
                     HBConfigSetup hbConfigSetup = new HBConfigSetup(player);
                     tokens = hbConfigSetup.getInt("player.tokens");
 
@@ -101,7 +102,8 @@ public class AnimatedScoreboard {
                     ScoreboardScore leave1 = new ScoreboardScore(board,obj,utils.translate("    &7in case you want to leave"));
                     ScoreboardScore leave2 = new ScoreboardScore(board,obj,utils.translate("    &7use &c&o/minigames leave"));
                     ScoreboardScore gameState = new ScoreboardScore(board,obj,utils.translate("    &a"+HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).gameState.getName()) + utils.translate("  &7(&a" +
-                            HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).minigameType.getName() + "&7)" + " &aPOINTS "+hubPlayer.gamePoints));
+                            HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).minigameType.getName() + "&7)"));
+                    ScoreboardScore points = new ScoreboardScore(board,obj,utils.translate(" &7POINTS: &a"+hubPlayer.gamePoints));
 
                     header.setScore(8);
                     owner.setScore(7);
@@ -109,6 +111,7 @@ public class AnimatedScoreboard {
                     leave1.setScore(5);
                     leave2.setScore(4);
                     gameState.setScore(3);
+                    points.setScore(2);
 
                     PacketPlayOutScoreboardScore ps1 = new PacketPlayOutScoreboardScore(header);
                     PacketPlayOutScoreboardScore ps2 = new PacketPlayOutScoreboardScore(owner);
@@ -116,6 +119,7 @@ public class AnimatedScoreboard {
                     PacketPlayOutScoreboardScore ps4 = new PacketPlayOutScoreboardScore(leave1);
                     PacketPlayOutScoreboardScore ps5 = new PacketPlayOutScoreboardScore(leave2);
                     PacketPlayOutScoreboardScore ps6 = new PacketPlayOutScoreboardScore(gameState);
+                    PacketPlayOutScoreboardScore ps7 = new PacketPlayOutScoreboardScore(points);
 
                     PacketUtils.sendPacket(player, removepacket);
                     PacketUtils.sendPacket(player, createpacket);
@@ -127,6 +131,70 @@ public class AnimatedScoreboard {
                     PacketUtils.sendPacket(player, ps4);
                     PacketUtils.sendPacket(player, ps5);
                     PacketUtils.sendPacket(player, ps6);
+                    PacketUtils.sendPacket(player, ps7);
+
+                    return;
+                }else if (hubPlayer.isInGame() && hubPlayer.getGame().minigameType == MinigameType.SKYWARS) {
+                    HBConfigSetup hbConfigSetup = new HBConfigSetup(player);
+                    tokens = hbConfigSetup.getInt("player.tokens");
+
+                    net.minecraft.server.v1_8_R3.Scoreboard board = new net.minecraft.server.v1_8_R3.Scoreboard();
+                    ScoreboardObjective obj = board.registerObjective("§eLobby Mode", IScoreboardCriteria.b);
+                    board.setDisplaySlot(1, obj);
+
+                    PacketPlayOutScoreboardObjective removepacket = new PacketPlayOutScoreboardObjective(obj, 1);
+                    PacketPlayOutScoreboardObjective createpacket = new PacketPlayOutScoreboardObjective(obj, 0);
+                    PacketPlayOutScoreboardDisplayObjective display = new PacketPlayOutScoreboardDisplayObjective(1, obj);
+
+                    ScoreboardScore header = new ScoreboardScore(board, obj, utils.translate("&7Game ID: &c&o") + hubPlayer.getGameID());
+                    /*
+                    if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getOwner() == null){
+                        owner = new ScoreboardScore(board, obj, utils.translate("&7Party leader: &a" + "&c&o@null &cleave!" ));
+                    }else{
+                        owner = new ScoreboardScore(board, obj, utils.translate("&7Party leader: &a" + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getOwner().getName()));
+                    }
+
+                     */
+
+                    owner = new ScoreboardScore(board, obj, utils.translate("&7Party leader: &a" + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).getOwner().getName()));
+                    ScoreboardScore list = new ScoreboardScore(board, obj, utils.translate("&7Player amount: &a") + HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).playerAmount);
+                    ScoreboardScore leave1 = new ScoreboardScore(board,obj,utils.translate("    &7in case you want to leave"));
+                    ScoreboardScore leave2 = new ScoreboardScore(board,obj,utils.translate("    &7use &c&o/minigames leave"));
+                    ScoreboardScore gameState = new ScoreboardScore(board,obj,utils.translate("    &a"+HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).gameState.getName()) + utils.translate("  &7(&a" +
+                            HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).minigameType.getName() + "&7)"));
+                    ScoreboardScore points = new ScoreboardScore(board,obj,utils.translate(" &7Kills: &a"+hubPlayer.gamePoints));
+                    ScoreboardScore alive = new ScoreboardScore(board,obj,utils.translate(" &7Alive: &a"+hubPlayer.getGame().skywarsPlayersAlive));
+
+                    header.setScore(8);
+                    owner.setScore(7);
+                    list.setScore(6);
+                    leave1.setScore(5);
+                    leave2.setScore(4);
+                    gameState.setScore(3);
+                    points.setScore(2);
+                    alive.setScore(1);
+
+                    PacketPlayOutScoreboardScore ps1 = new PacketPlayOutScoreboardScore(header);
+                    PacketPlayOutScoreboardScore ps2 = new PacketPlayOutScoreboardScore(owner);
+                    PacketPlayOutScoreboardScore ps3 = new PacketPlayOutScoreboardScore(list);
+                    PacketPlayOutScoreboardScore ps4 = new PacketPlayOutScoreboardScore(leave1);
+                    PacketPlayOutScoreboardScore ps5 = new PacketPlayOutScoreboardScore(leave2);
+                    PacketPlayOutScoreboardScore ps6 = new PacketPlayOutScoreboardScore(gameState);
+                    PacketPlayOutScoreboardScore ps7 = new PacketPlayOutScoreboardScore(points);
+                    PacketPlayOutScoreboardScore ps8 = new PacketPlayOutScoreboardScore(alive);
+
+                    PacketUtils.sendPacket(player, removepacket);
+                    PacketUtils.sendPacket(player, createpacket);
+                    PacketUtils.sendPacket(player, display);
+
+                    PacketUtils.sendPacket(player, ps1);
+                    PacketUtils.sendPacket(player, ps2);
+                    PacketUtils.sendPacket(player, ps3);
+                    PacketUtils.sendPacket(player, ps4);
+                    PacketUtils.sendPacket(player, ps5);
+                    PacketUtils.sendPacket(player, ps6);
+                    PacketUtils.sendPacket(player, ps7);
+                    PacketUtils.sendPacket(player, ps8);
 
                     return;
                 } else if (!hubPlayer.isInGame()) {

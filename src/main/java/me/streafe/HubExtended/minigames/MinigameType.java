@@ -5,7 +5,8 @@ public enum MinigameType {
     ARROW("ARROW"),
     BARBARIAN("BARBARIAN"),
     OITC("OITC"),
-    FFA("FFA");
+    FFA("FFA"),
+    SKYWARS("SKYWARS");
 
     String name;
 

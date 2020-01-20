@@ -32,6 +32,10 @@ public class HubPlayer {
         friends = new ArrayList<>();
     }
 
+    public void setGamePoints(int i){
+        this.gamePoints = i;
+    }
+
 
     public boolean inGame(HubPlayer hubPlayer){
         if(this.isInGame()){
