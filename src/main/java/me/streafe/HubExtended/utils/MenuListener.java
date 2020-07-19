@@ -1,7 +1,10 @@
 package me.streafe.HubExtended.utils;
 
 import me.streafe.HubExtended.HubExtended;
+import me.streafe.HubExtended.bungee.BungeeMessageListener;
+import me.streafe.HubExtended.gameAccessories.KillEffect;
 import me.streafe.HubExtended.gameAccessories.KillEffects;
+import me.streafe.HubExtended.gameAccessories.VictoryDances;
 import me.streafe.HubExtended.minigames.MinigameCountdownTask;
 import me.streafe.HubExtended.player_utils.HBConfigSetup;
 import me.streafe.HubExtended.player_utils.HubPlayer;
@@ -45,6 +48,20 @@ public class MenuListener implements Listener {
             e.setCancelled(true);
         }
 
+        else if(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()).equalsIgnoreCase("Server Switcher")){
+            Menu menu = new Menu("Server Switcher",27);
+            menu.serverSwitcher(p);
+            e.setCancelled(true);
+        }
+
+        if(e.getCurrentItem().getItemMeta().getDisplayName().contains("secret")){
+            e.setCancelled(true);
+        }
+
+        if(e.getCurrentItem().getItemMeta().getDisplayName().contains("|")){
+            e.setCancelled(true);
+        }
+
         if(e.getClickedInventory().getTitle().equalsIgnoreCase("settings")){
             if ((ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()).equalsIgnoreCase("sign edit (disabled)"))){
                 hubPlayer.signEditEnable = true;
@@ -64,6 +81,21 @@ public class MenuListener implements Listener {
                 menu.gameSettings(p);
             }
 
+
+        }
+
+        if(e.getClickedInventory().getTitle().equalsIgnoreCase("Server Switcher")){
+            if ((ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()).equalsIgnoreCase("Hub"))){
+                e.setCancelled(true);
+                BungeeMessageListener bungeeMessageListener = new BungeeMessageListener();
+                bungeeMessageListener.connectToServer((Player) e.getWhoClicked(),"hub");
+            }else if((ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()).equalsIgnoreCase("Survival"))){
+                e.setCancelled(true);
+                p.sendMessage(Utils.translateInnerclass("&cServer soon up!"));
+                p.sendMessage(Utils.translateInnerclass("&cAnnouncement when up!"));
+                BungeeMessageListener bungeeMessageListener = new BungeeMessageListener();
+                bungeeMessageListener.connectToServer((Player) e.getWhoClicked(),"survival");
+            }
 
         }
 
@@ -100,6 +132,8 @@ public class MenuListener implements Listener {
             }
 
             else if((ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()).equalsIgnoreCase("Victory Dances"))){
+                Menu menu = new Menu("Victory Dances",18);
+                menu.victoryDances(p);
                 e.setCancelled(true);
             }
 
@@ -114,82 +148,155 @@ public class MenuListener implements Listener {
             }
 
         }
-
-        else if(e.getClickedInventory().getTitle().equalsIgnoreCase("Kill Effects")){
-
+        else if(e.getClickedInventory().getTitle().equalsIgnoreCase("Victory Dances")){
 
             if((ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()).equalsIgnoreCase("back"))){
                 Menu menu = new Menu("Game Settings",36);
                 menu.gameSettings(p);
                 e.setCancelled(true);
-            }else if(e.getCurrentItem().getItemMeta().getDisplayName().contains("Head Rocket")){
+            }else if(e.getCurrentItem().getItemMeta().getDisplayName().contains("Dragon Rider")){
                 HBConfigSetup hbConfigSetup = new HBConfigSetup(p);
-                hbConfigSetup.editString("player.killEffectInUse",KillEffects.HEADROCKET.getName());
+                hbConfigSetup.editString("player.victoryDanceInUse", VictoryDances.DRAGONRIDER.getName());
 
                 MinigameCountdownTask task = new MinigameCountdownTask(0L,5L) {
                     @Override
                     public void run() {
-                        e.getClickedInventory().setItem(34,hbConfigSetup.getKillEffectItem(hubPlayer.killEffect));
+                        e.getClickedInventory().setItem(34,hbConfigSetup.getVictoryDanceItem(hubPlayer.victoryDances));
+                        cancelTask();
+                    }
+                };
+
+                hubPlayer.victoryDances = VictoryDances.DRAGONRIDER;
+                p.playSound(p.getLocation(),Sound.NOTE_STICKS,1f,1f);
+                e.setCancelled(true);
+            }else if(e.getCurrentItem().getItemMeta().getDisplayName().contains("Zombie Rider")){
+                HBConfigSetup hbConfigSetup = new HBConfigSetup(p);
+                hbConfigSetup.editString("player.victoryDanceInUse",VictoryDances.ZOMBIERIDER.getName());
+
+                MinigameCountdownTask task = new MinigameCountdownTask(0L,5L) {
+                    @Override
+                    public void run() {
+                        e.getClickedInventory().setItem(34,hbConfigSetup.getVictoryDanceItem(hubPlayer.victoryDances));
+                        cancelTask();
+                    }
+                };
+
+                hubPlayer.victoryDances = VictoryDances.ZOMBIERIDER;
+                p.playSound(p.getLocation(),Sound.NOTE_STICKS,1f,1f);
+                e.setCancelled(true);
+            }else if(e.getCurrentItem().getItemMeta().getDisplayName().contains("Horse Rider")){
+                HBConfigSetup hbConfigSetup = new HBConfigSetup(p);
+                hbConfigSetup.editString("player.victoryDanceInUse",VictoryDances.HORSERIDER.getName());
+
+                MinigameCountdownTask task = new MinigameCountdownTask(0L,5L) {
+                    @Override
+                    public void run() {
+                        e.getClickedInventory().setItem(34,hbConfigSetup.getVictoryDanceItem(hubPlayer.victoryDances));
+                        cancelTask();
+                    }
+                };
+
+                hubPlayer.victoryDances = VictoryDances.HORSERIDER;
+                p.playSound(p.getLocation(),Sound.NOTE_STICKS,1f,1f);
+                e.setCancelled(true);
+
+            }
+
+            if(e.getCurrentItem().getItemMeta().getDisplayName().contains("NONE")){
+                HBConfigSetup hbConfigSetup = new HBConfigSetup(p);
+                hbConfigSetup.editString("player.victoryDanceInUse",VictoryDances.NONE.getName());
+
+                MinigameCountdownTask task = new MinigameCountdownTask(0L,5L) {
+                    @Override
+                    public void run() {
+                        e.getClickedInventory().setItem(34,hbConfigSetup.getVictoryDanceItem(hubPlayer.victoryDances));
+                        cancelTask();
+                    }
+                };
+
+                hubPlayer.victoryDances = VictoryDances.NONE;
+                p.playSound(p.getLocation(),Sound.NOTE_STICKS,1f,1f);
+                e.setCancelled(true);
+
+            }
+
+
+        }
+
+
+        else if(e.getClickedInventory().getTitle().equalsIgnoreCase("Kill Effects")) {
+
+            if ((ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()).equalsIgnoreCase("back"))) {
+                Menu menu = new Menu("Game Settings", 36);
+                menu.gameSettings(p);
+                e.setCancelled(true);
+            } else if (e.getCurrentItem().getItemMeta().getDisplayName().contains("Head Rocket")) {
+                HBConfigSetup hbConfigSetup = new HBConfigSetup(p);
+                hbConfigSetup.editString("player.killEffectInUse", KillEffects.HEADROCKET.getName());
+
+                MinigameCountdownTask task = new MinigameCountdownTask(0L, 5L) {
+                    @Override
+                    public void run() {
+                        e.getClickedInventory().setItem(34, hbConfigSetup.getKillEffectItem(hubPlayer.killEffect));
                         cancelTask();
                     }
                 };
 
                 hubPlayer.killEffect = KillEffects.HEADROCKET;
-                p.playSound(p.getLocation(),Sound.NOTE_STICKS,1f,1f);
+                p.playSound(p.getLocation(), Sound.NOTE_STICKS, 1f, 1f);
                 e.setCancelled(true);
-            }else if(e.getCurrentItem().getItemMeta().getDisplayName().contains("Party Explosion")){
+            } else if (e.getCurrentItem().getItemMeta().getDisplayName().contains("Party Explosion")) {
                 HBConfigSetup hbConfigSetup = new HBConfigSetup(p);
-                hbConfigSetup.editString("player.killEffectInUse",KillEffects.PARTYEXPLOSION.getName());
+                hbConfigSetup.editString("player.killEffectInUse", KillEffects.PARTYEXPLOSION.getName());
 
-                MinigameCountdownTask task = new MinigameCountdownTask(0L,5L) {
+                MinigameCountdownTask task = new MinigameCountdownTask(0L, 5L) {
                     @Override
                     public void run() {
-                        e.getClickedInventory().setItem(34,hbConfigSetup.getKillEffectItem(hubPlayer.killEffect));
+                        e.getClickedInventory().setItem(34, hbConfigSetup.getKillEffectItem(hubPlayer.killEffect));
                         cancelTask();
                     }
                 };
 
                 hubPlayer.killEffect = KillEffects.PARTYEXPLOSION;
-                p.playSound(p.getLocation(),Sound.NOTE_STICKS,1f,1f);
+                p.playSound(p.getLocation(), Sound.NOTE_STICKS, 1f, 1f);
                 e.setCancelled(true);
-            }else if(e.getCurrentItem().getItemMeta().getDisplayName().contains("Blood Explosion")){
+            } else if (e.getCurrentItem().getItemMeta().getDisplayName().contains("Blood Explosion")) {
                 HBConfigSetup hbConfigSetup = new HBConfigSetup(p);
-                hbConfigSetup.editString("player.killEffectInUse",KillEffects.BLOODEXPLOSION.getName());
+                hbConfigSetup.editString("player.killEffectInUse", KillEffects.BLOODEXPLOSION.getName());
 
-                MinigameCountdownTask task = new MinigameCountdownTask(0L,5L) {
+                MinigameCountdownTask task = new MinigameCountdownTask(0L, 5L) {
                     @Override
                     public void run() {
-                        e.getClickedInventory().setItem(34,hbConfigSetup.getKillEffectItem(hubPlayer.killEffect));
+                        e.getClickedInventory().setItem(34, hbConfigSetup.getKillEffectItem(hubPlayer.killEffect));
                         cancelTask();
                     }
                 };
 
                 hubPlayer.killEffect = KillEffects.BLOODEXPLOSION;
-                p.playSound(p.getLocation(),Sound.NOTE_STICKS,1f,1f);
+                p.playSound(p.getLocation(), Sound.NOTE_STICKS, 1f, 1f);
                 e.setCancelled(true);
 
-            } else if(e.getCurrentItem().getItemMeta().getDisplayName().contains("Final Smash")){
-            HBConfigSetup hbConfigSetup = new HBConfigSetup(p);
-            hbConfigSetup.editString("player.killEffectInUse",KillEffects.FINALSMASH.getName());
-
-            MinigameCountdownTask task = new MinigameCountdownTask(0L,5L) {
-                @Override
-                public void run() {
-                    e.getClickedInventory().setItem(34,hbConfigSetup.getKillEffectItem(hubPlayer.killEffect));
-                    cancelTask();
-                }
-            };
-
-            hubPlayer.killEffect = KillEffects.FINALSMASH;
-            p.playSound(p.getLocation(),Sound.NOTE_STICKS,1f,1f);
-            e.setCancelled(true);
-
-
-        }else if(e.getCurrentItem().getItemMeta().getDisplayName().contains("secret")){
-                e.setCancelled(true);
-            }else if(e.getCurrentItem().getItemMeta().getDisplayName().contains("NONE")){
+            } else if (e.getCurrentItem().getItemMeta().getDisplayName().contains("Final Smash")) {
                 HBConfigSetup hbConfigSetup = new HBConfigSetup(p);
-                hbConfigSetup.editString("player.killEffectInUse",KillEffects.NONE.getName());
+                hbConfigSetup.editString("player.killEffectInUse", KillEffects.FINALSMASH.getName());
+
+                MinigameCountdownTask task = new MinigameCountdownTask(0L, 5L) {
+                    @Override
+                    public void run() {
+                        e.getClickedInventory().setItem(34, hbConfigSetup.getKillEffectItem(hubPlayer.killEffect));
+                        cancelTask();
+                    }
+                };
+
+                hubPlayer.killEffect = KillEffects.FINALSMASH;
+                p.playSound(p.getLocation(), Sound.NOTE_STICKS, 1f, 1f);
+                e.setCancelled(true);
+
+            }
+
+            if(e.getCurrentItem().getItemMeta().getDisplayName().contains("NONE")){
+                HBConfigSetup hbConfigSetup = new HBConfigSetup(p);
+                hbConfigSetup.editString("player.killEffectInUse", KillEffects.NONE.getName());
 
                 MinigameCountdownTask task = new MinigameCountdownTask(0L,5L) {
                     @Override
@@ -213,7 +320,7 @@ public class MenuListener implements Listener {
     public void onPlayerClickItemInHand(PlayerInteractEvent e){
         if(!(e.getPlayer().getItemInHand().hasItemMeta()))return;
         if(e.getPlayer().getItemInHand() == null)return;
-        if(!(e.getPlayer().getItemInHand().getItemMeta().getDisplayName().contains("Settings"))) return;
+        if(!(e.getPlayer().getItemInHand().getItemMeta().getDisplayName().contains("Settings") || e.getPlayer().getItemInHand().getItemMeta().getDisplayName().contains("Server Switcher") )) return;
         if(e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK){
             e.setCancelled(true);
             if(ChatColor.stripColor(e.getPlayer().getItemInHand().getItemMeta().getDisplayName()).equalsIgnoreCase("Settings")){
@@ -223,6 +330,17 @@ public class MenuListener implements Listener {
                     @Override
                     public void run() {
                         menu.settingsMenu(e.getPlayer());
+                        cancelTask();
+                    }
+                };
+            }
+            else if(ChatColor.stripColor(e.getPlayer().getItemInHand().getItemMeta().getDisplayName()).equalsIgnoreCase("Server Switcher")){
+                Menu menu = new Menu("Server Switcher",27);
+
+                MinigameCountdownTask task = new MinigameCountdownTask(0L,20L) {
+                    @Override
+                    public void run() {
+                        menu.serverSwitcher(e.getPlayer());
                         cancelTask();
                     }
                 };

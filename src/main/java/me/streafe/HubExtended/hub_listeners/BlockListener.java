@@ -9,8 +9,10 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 public class BlockListener implements Listener {
     Utils utils = new Utils();
+
     @EventHandler
     public void playerBlockBreak(BlockBreakEvent e){
+        if(!e.getPlayer().getWorld().getName().equalsIgnoreCase("world"))return;
         if(!e.getPlayer().isOp()){
             Player player = e.getPlayer();
             player.sendMessage(utils.translate("&cYou can't break blocks in the hub"));
@@ -20,6 +22,7 @@ public class BlockListener implements Listener {
     }
     @EventHandler
     public void playerBlockBreak(BlockPlaceEvent e){
+        if(!e.getPlayer().getWorld().getName().equalsIgnoreCase("world"))return;
         if(!e.getPlayer().isOp()){
             Player player = e.getPlayer();
             player.sendMessage(utils.translate("&cYou can't place blocks in the hub"));

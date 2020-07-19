@@ -52,6 +52,26 @@ public class PlayerRankUpdate {
                     player.setDisplayName(sb.getTeam("VIP").getPrefix() + player.getName());
 
                     team = sb.getTeam("VIP");
+                }else if(hubPlayer.rank == RankEnum.ALIEN){
+                    if(sb.getTeam("ALIEN") == null){
+                        sb.registerNewTeam("ALIEN");
+                    }
+                    sb.getTeam("ALIEN").setPrefix(utils.translate("&5ALIEN &7| "));
+
+                    sb.getTeam("ALIEN").addPlayer(player);
+                    player.setDisplayName(sb.getTeam("ALIEN").getPrefix() + player.getName());
+
+                    team = sb.getTeam("ALIEN");
+                }else if(hubPlayer.rank == RankEnum.ALIENPLUSS){
+                    if(sb.getTeam("ALIENPLUSS") == null){
+                        sb.registerNewTeam("ALIENPLUSS");
+                    }
+                    sb.getTeam("ALIENPLUSS").setPrefix(utils.translate("&5ALIEN+ &7| "));
+
+                    sb.getTeam("ALIENPLUSS").addPlayer(player);
+                    player.setDisplayName(sb.getTeam("ALIENPLUSS").getPrefix() + player.getName());
+
+                    team = sb.getTeam("ALIENPLUSS");
                 } else if(hubPlayer.rank == RankEnum.MODERATOR){
                     if(sb.getTeam("MODERATOR") == null){
                         sb.registerNewTeam("MODERATOR");

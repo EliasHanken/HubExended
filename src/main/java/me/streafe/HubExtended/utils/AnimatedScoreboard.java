@@ -6,12 +6,19 @@ import me.streafe.HubExtended.minigames.MinigameCountdownTask;
 import me.streafe.HubExtended.minigames.MinigameType;
 import me.streafe.HubExtended.player_utils.HBConfigSetup;
 import me.streafe.HubExtended.player_utils.HubPlayer;
+import me.streafe.HubExtended.player_utils.RankEnum;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
 import org.bukkit.scoreboard.Scoreboard;
+
+import java.net.InetSocketAddress;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class AnimatedScoreboard {
 
@@ -24,6 +31,8 @@ public class AnimatedScoreboard {
     public String animatedText;
     int time;
     public ScoreboardScore owner;
+    private String serverName;
+    private int online;
 
     Utils utils = new Utils();
 
@@ -31,6 +40,7 @@ public class AnimatedScoreboard {
         this.player = player;
         this.hubPlayer = HubExtended.getInstance().getHubPlayer(player.getUniqueId());
     }
+
 
     public void animateText(){
         this.time = 2;
@@ -50,6 +60,8 @@ public class AnimatedScoreboard {
 
         },0L,20L);
     }
+
+
 
     public void view(){
 
@@ -203,7 +215,7 @@ public class AnimatedScoreboard {
                     tokens = hbConfigSetup.getInt("player.tokens");
 
                     net.minecraft.server.v1_8_R3.Scoreboard board = new net.minecraft.server.v1_8_R3.Scoreboard();
-                    ScoreboardObjective obj = board.registerObjective("§b§lLightCraft", IScoreboardCriteria.b);
+                    ScoreboardObjective obj = board.registerObjective("§eStreafeNetwork", IScoreboardCriteria.b);
                     board.setDisplaySlot(1, obj);
 
 
@@ -218,6 +230,10 @@ public class AnimatedScoreboard {
                         prefix = "&7";
                     }else if (hbConfigSetup.get("player.rank").equalsIgnoreCase("VIP")) {
                         prefix = "&e";
+                    }else if (hbConfigSetup.get("player.rank").equalsIgnoreCase("ALIEN")){
+                        prefix = "&5";
+                    }else if(hbConfigSetup.get("player.rank").equalsIgnoreCase("ALIENPLUSS")){
+                        prefix = "&5";
                     } else if (hbConfigSetup.get("player.rank").equalsIgnoreCase("MODERATOR")) {
                         prefix = "&3";
                     } else if (hbConfigSetup.get("player.rank").equalsIgnoreCase("ADMIN")) {
@@ -230,16 +246,27 @@ public class AnimatedScoreboard {
                         prefix = "&4";
                     }
 
-                    ScoreboardScore s1 = new ScoreboardScore(board, obj, utils.translate(" "));
-                    ScoreboardScore s2 = new ScoreboardScore(board, obj, utils.translate("&b&lYour Profile:"));
-                    ScoreboardScore s3 = new ScoreboardScore(board, obj, utils.translate("  &bRank: " + prefix + hbConfigSetup.get("player.rank")));
-                    ScoreboardScore s4 = new ScoreboardScore(board, obj, utils.translate("  &bTokens: &7" + tokens + " &b✯"));
-                    ScoreboardScore s5 = new ScoreboardScore(board, obj, "");
-                    ScoreboardScore s6 = new ScoreboardScore(board, obj, utils.translate("&7&lInfo:"));
-                    ScoreboardScore s7 = new ScoreboardScore(board, obj, utils.translate("  &bOnline: &f" + HubExtended.getInstance().getServer().getOnlinePlayers().size()));
-                    ScoreboardScore s8 = new ScoreboardScore(board, obj, utils.translate("  &bLocation: &f" + BungeeMessageListener.getServerName(player)));
-                    ScoreboardScore s9 = new ScoreboardScore(board, obj, utils.translate("  &bWins: &f" + hubPlayer.wins));
-                    ScoreboardScore s10 = new ScoreboardScore(board, obj, utils.translate("  &bLevel: &a" + hubPlayer.level));
+                    Date date = new Date();
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+                    ScoreboardScore s1 = new ScoreboardScore(board, obj, utils.translate("&7" + formatter.format(date)));
+                    ScoreboardScore s2 = new ScoreboardScore(board, obj, utils.translate(" "));
+                    ScoreboardScore s3 = new ScoreboardScore(board, obj, utils.translate("&fRank: " + prefix + RankEnum.valueOf(hbConfigSetup.get("player.rank")).getPrefix()));
+                    ScoreboardScore s4 = new ScoreboardScore(board, obj, utils.translate("&fTokens: &a" + tokens + "✯"));
+                    BungeeMessageListener bungeeMessageListener = new BungeeMessageListener();
+                    HubExtended.getInstance().getBungeeChannelApi().getPlayerCount("ALL").whenComplete((result,error) -> {
+                        online = result;
+                    });
+                    ScoreboardScore s5 = new ScoreboardScore(board, obj, utils.translate("&fOnline: &a" + online));
+
+                    HubExtended.getInstance().getBungeeChannelApi().getServer().whenComplete((result,error) -> {
+                        serverName = result;
+                    });
+
+                    ScoreboardScore s6 = new ScoreboardScore(board, obj, utils.translate("&fServer: &a" + serverName));
+                    ScoreboardScore s7 = new ScoreboardScore(board, obj, utils.translate("&fWins: &a" + hubPlayer.wins));
+                    ScoreboardScore s8 = new ScoreboardScore(board, obj, utils.translate("&fLevel: &a" + hubPlayer.level));
+                    ScoreboardScore s9 = new ScoreboardScore(board, obj, utils.translate(""));
+                    ScoreboardScore s10 = new ScoreboardScore(board, obj, utils.translate("&estreafenetwork.gg"));
 
                     /*
                     if(hubPlayer.inGame){
@@ -340,9 +367,15 @@ public class AnimatedScoreboard {
 
                 if(hbConfigSetup.get("player.rank").equalsIgnoreCase("MEMBER")){
                     prefix = "&7";
-                } else if(hbConfigSetup.get("player.rank").equalsIgnoreCase("MODERATOR")){
+                } else if(hbConfigSetup.get("player.rank").equalsIgnoreCase("VIP")){
+                    prefix = "&a";
+                }else if(hbConfigSetup.get("player.rank").equalsIgnoreCase("ALIEN")){
+                    prefix = "&5";
+                }else if(hbConfigSetup.get("player.rank").equalsIgnoreCase("ALIENPLUSS")){
+                    prefix = "&5";
+                }else if(hbConfigSetup.get("player.rank").equalsIgnoreCase("MODERATOR")) {
                     prefix = "&3";
-                } else if(hbConfigSetup.get("player.rank").equalsIgnoreCase("ADMIN")){
+                }else if(hbConfigSetup.get("player.rank").equalsIgnoreCase("ADMIN")){
                     prefix = "&c";
                 } else if(hbConfigSetup.get("player.rank").equalsIgnoreCase("CO_OWNER")){
                     prefix = "&d";

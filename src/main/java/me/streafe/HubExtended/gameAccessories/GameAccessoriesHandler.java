@@ -44,7 +44,7 @@ public class GameAccessoriesHandler {
         }else if(hubPlayer.killEffect == KillEffects.FINALSMASH){
             KillEffectFinalSmash finalSmash = new KillEffectFinalSmash();
             finalSmash.play(player,location);
-            player.playSound(location, Sound.FIREWORK_LAUNCH,(float)0.5,(float)-4);
+            player.playSound(location, Sound.FIREWORK_LAUNCH,0.5F,0.5F);
         }
     }
 

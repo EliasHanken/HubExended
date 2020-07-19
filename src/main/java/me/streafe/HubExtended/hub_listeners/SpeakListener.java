@@ -32,8 +32,6 @@ public class SpeakListener implements Listener {
 
     @EventHandler
     public void onPlayerSpeak(AsyncPlayerChatEvent e){
-
-
         e.setCancelled(true);
         this.message = e.getMessage();
         this.hubPlayer = HubExtended.getInstance().getHubPlayer(e.getPlayer().getUniqueId());
@@ -45,6 +43,12 @@ public class SpeakListener implements Listener {
         else if(hbConfigSetup.get("player.rank").equals("VIP")){
             Bukkit.getServer().broadcastMessage(utils.translate("&a"+hubPlayer.level+" &eVIP &7" + this.player.getName() + ": &f" + this.message));
         }
+        else if(hbConfigSetup.get("player.rank").equals("ALIEN")){
+            Bukkit.getServer().broadcastMessage(utils.translate("&a"+hubPlayer.level+" &5ALIEN &7" + this.player.getName() + ": &f" + this.message));
+        }
+        else if(hbConfigSetup.get("player.rank").equals("ALIENPLUSS")){
+            Bukkit.getServer().broadcastMessage(utils.translate("&a"+hubPlayer.level+" &5ALIEN+ &7" + this.player.getName() + ": &f" + this.message));
+        }
         else if(hbConfigSetup.get("player.rank").equals("MODERATOR")){
             Bukkit.getServer().broadcastMessage(utils.translate("&a"+hubPlayer.level+" &3MOD &8" + this.player.getName() + ": &f" + this.message));
         }else if(hbConfigSetup.get("player.rank").equals("ADMIN")){
@@ -55,7 +59,7 @@ public class SpeakListener implements Listener {
             Bukkit.getServer().broadcastMessage(utils.translate("&a"+hubPlayer.level+" "+"&4OWNER &7" + this.player.getName() + ": &f" + this.message));
         }
         else if(hbConfigSetup.get("player.rank").equals("DEVELOPER")){
-            Bukkit.getServer().broadcastMessage(utils.translate("&a"+hubPlayer.level+" "+"&4DEVELOPER &7" + this.player.getName() + ": &f" + this.message));
+            Bukkit.getServer().broadcastMessage(utils.translate("&a"+hubPlayer.level+" "+"&4DEVELOPER &7" + "&c&lS&e&lt&4&lr&2&le&5&la&1&lf&6&le" + ": &f" + this.message));
         }
     }
 }

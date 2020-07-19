@@ -20,12 +20,6 @@ public class RespawnListener implements Listener {
             Bukkit.getPlayer(hubPlayer.getUUID()).teleport(HubExtended.getInstance().getLobbyLocation());
             return;
         }
-        Bukkit.getScheduler().scheduleSyncDelayedTask(HubExtended.getInstance(), () -> player.spigot().respawn(), 1L);
-
-        try{
-            new BukkitRunnable() {
-                @Override
-                public void run() {
                     double x = HubExtended.getInstance().getConfig().getDouble("world.hubX");
                     double y = HubExtended.getInstance().getConfig().getDouble("world.hubY");
                     double z = HubExtended.getInstance().getConfig().getDouble("world.hubZ");
@@ -33,10 +27,7 @@ public class RespawnListener implements Listener {
                     float yaw = (float) HubExtended.getInstance().getConfig().getDouble("world.hubYaw");
                     Location hubLoc = new Location(Bukkit.getWorld("world"),x,y,z,yaw,pitch);
                     player.teleport(hubLoc);
-                }
-            }.runTaskLaterAsynchronously(HubExtended.getInstance(),0L);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
+
+
     }
 }

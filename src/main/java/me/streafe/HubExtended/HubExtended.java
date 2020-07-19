@@ -1,9 +1,14 @@
 package me.streafe.HubExtended;
 
+import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteStreams;
+import me.streafe.HubExtended.api_handler.API;
+import me.streafe.HubExtended.bungee.BungeeChannelApi;
 import me.streafe.HubExtended.bungee.BungeeConnect;
 import me.streafe.HubExtended.bungee.BungeeMessage;
 import me.streafe.HubExtended.bungee.BungeeMessageListener;
 import me.streafe.HubExtended.hub_commands.AllowedCommandsPerRank;
+import me.streafe.HubExtended.hub_commands.RankCommand;
 import me.streafe.HubExtended.hub_commands.lucky_chest_command;
 import me.streafe.HubExtended.hub_commands.menu_command;
 import me.streafe.HubExtended.hub_listeners.BlockListener;
@@ -12,7 +17,6 @@ import me.streafe.HubExtended.hub_listeners.JoinListener;
 import me.streafe.HubExtended.hub_listeners.SpeakListener;
 import me.streafe.HubExtended.minigames.Minigame;
 import me.streafe.HubExtended.minigames.MinigameCommand;
-import me.streafe.HubExtended.minigames.MinigameHandler;
 import me.streafe.HubExtended.minigames.OITCCommand;
 import me.streafe.HubExtended.player_utils.HBConfigSetup;
 import me.streafe.HubExtended.player_utils.HubPlayer;
@@ -23,15 +27,18 @@ import me.streafe.HubExtended.utils.MenuListener;
 import me.streafe.HubExtended.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.sql.SQLException;
 import java.util.*;
 
-public class HubExtended extends JavaPlugin {
+public class HubExtended extends JavaPlugin implements PluginMessageListener {
+
+    private API api = (API) Bukkit.getServer().getPluginManager().getPlugin("HubExtended");
 
     private static HubExtended instance;
     private String host, usr, pw, dbn;
@@ -41,14 +48,23 @@ public class HubExtended extends JavaPlugin {
     private Map<UUID,HubPlayer> hubPlayerList;
     private Scoreboard mainScoreboard;
     private String nmsVersion;
+    private BungeeChannelApi bungeeChannelApi;
+
+    private Utils utils = new Utils();
+
 
     @Override
     public void onDisable(){
         for(Player playersOnline : getServer().getOnlinePlayers()){
+            /*
             HBConfigSetup hbConfigSetup = new HBConfigSetup(playersOnline);
             ItemContent itemContent = new ItemContent(playersOnline);
 
+
+
             itemContent.savePlayerInventory(playersOnline);
+
+             */
 
             playersOnline.getInventory().clear();
         }
@@ -63,6 +79,7 @@ public class HubExtended extends JavaPlugin {
             getServer().getConsoleSender().sendMessage(Utils.translateInnerclass("&cYou need server to be running v1_8_R3"));
             this.getServer().getPluginManager().disablePlugin(this);
         }
+
         getConfig().options().copyDefaults(true);
         saveConfig();
         getServer().getConsoleSender().sendMessage(Utils.translateInnerclass("&aRunning on spigot " + getNmsVersion()));
@@ -70,6 +87,8 @@ public class HubExtended extends JavaPlugin {
         getCommand("msg").setExecutor(new BungeeMessage());
         getCommand("hub").setExecutor(new BungeeConnect());
         getCommand("sethub").setExecutor(new BungeeConnect());
+        getCommand("setrank").setExecutor(new RankCommand());
+        getCommand("ranklist").setExecutor(new RankCommand());
 
         this.mainScoreboard = this.getServer().getScoreboardManager().getNewScoreboard();
 
@@ -121,11 +140,17 @@ public class HubExtended extends JavaPlugin {
         for(Player playersOnline : getServer().getOnlinePlayers()){
             try{
                 JoinListener.updateOnlinePlayers(playersOnline);
+                playersOnline.getInventory().setItem(1,Utils.getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTRkNDliYWU5NWM3OTBjM2IxZmY1YjJmMDEwNTJhNzE0ZDYxODU0ODFkNWIxYzg1OTMwYjNmOTlkMjMyMTY3NCJ9fX0=","&cSettings"));
+                playersOnline.getInventory().setItem(0,utils.createNewItemWithMeta("&7Compass to send you","&7to other servers!", Material.COMPASS,"&cServer Switcher"));
+                playersOnline.getInventory().setItem(2,utils.createNewItemWithMeta("&7Duel other noobs","&7choose your opponent", Material.DIAMOND_SWORD,"&cDuel Player &a(Left-click)"));
+
+
             }catch (Exception e){
                 e.printStackTrace();
             }
         }
 
+        /*
         for(Player playersOnline : getServer().getOnlinePlayers()){
             HBConfigSetup hbConfigSetup = new HBConfigSetup(playersOnline);
             ItemContent itemContent = new ItemContent(playersOnline);
@@ -133,6 +158,10 @@ public class HubExtended extends JavaPlugin {
             playersOnline.getInventory().setContents(itemContent.getSavedPlayerInventory(hbConfigSetup.get("player.inventory")));
         }
 
+
+         */
+
+        this.bungeeChannelApi = BungeeChannelApi.of(this);
 
     }
 
@@ -185,5 +214,23 @@ public class HubExtended extends JavaPlugin {
 
     public Scoreboard getMainScoreboard() {
         return mainScoreboard;
+    }
+
+
+    @Override
+    public void onPluginMessageReceived(String channel, Player player, byte[] message) {
+        if(!channel.equals("BungeeCord")){
+            return;
+        }
+        ByteArrayDataInput in = ByteStreams.newDataInput(message);
+        String subchannel = in.readUTF();
+        if (subchannel.equals("SomeSubChannel")) {
+            // Use the code sample in the 'Response' sections below to read
+            // the data.
+        }
+    }
+
+    public BungeeChannelApi getBungeeChannelApi() {
+        return bungeeChannelApi;
     }
 }

@@ -2,6 +2,7 @@ package me.streafe.HubExtended.utils;
 
 import me.streafe.HubExtended.HubExtended;
 import me.streafe.HubExtended.gameAccessories.KillEffects;
+import me.streafe.HubExtended.gameAccessories.VictoryDances;
 import me.streafe.HubExtended.player_utils.HBConfigSetup;
 import me.streafe.HubExtended.player_utils.HubPlayer;
 import me.streafe.HubExtended.player_utils.RankEnum;
@@ -27,6 +28,8 @@ public class Menu implements Listener {
     private int size;
     public Inventory inv;
     private HubPlayer hubPlayer;
+    private int hubOnline;
+    private int survivalOnline;
 
     private ItemStack signEdit, openLuckyChestItem, rankItem;
 
@@ -63,16 +66,22 @@ public class Menu implements Listener {
 
         if(hubPlayer.rank == RankEnum.MEMBER){
             rankMeta.setLore(Arrays.asList(utils.translate("&7Member")));
+        }else if(hubPlayer.rank == RankEnum.VIP){
+            rankMeta.setLore(Arrays.asList(utils.translate("&aVIP")));
+        }else if(hubPlayer.rank == RankEnum.ALIEN){
+            rankMeta.setLore(Arrays.asList(utils.translate("&5ALIEN")));
+        }else if(hubPlayer.rank == RankEnum.ALIENPLUSS){
+            rankMeta.setLore(Arrays.asList(utils.translate("&5ALIEN+")));
         }else if(hubPlayer.rank == RankEnum.MODERATOR){
-            rankMeta.setLore(Arrays.asList(utils.translate("&3Moderator")));
+            rankMeta.setLore(Arrays.asList(utils.translate("&3MOD")));
         }else if(hubPlayer.rank == RankEnum.ADMIN){
-            rankMeta.setLore(Arrays.asList(utils.translate("&cAdmin")));
+            rankMeta.setLore(Arrays.asList(utils.translate("&cADMIN")));
         }else if(hubPlayer.rank == RankEnum.CO_OWNER){
             rankMeta.setLore(Arrays.asList(utils.translate("&dCo-Owner")));
         }else if(hubPlayer.rank == RankEnum.OWNER){
             rankMeta.setLore(Arrays.asList(utils.translate("&4Owner")));
         }else if(hubPlayer.rank == RankEnum.DEVELOPER){
-            rankMeta.setLore(Arrays.asList(utils.translate("&4Owner")));
+            rankMeta.setLore(Arrays.asList(utils.translate("&4DEVELOPER")));
         }
         rankItem.setItemMeta(rankMeta);
 
@@ -89,6 +98,28 @@ public class Menu implements Listener {
         inv.setItem(31,utils.createItem("&cBack",Material.BED));
 
 
+    }
+
+    public void serverSwitcher(Player player){
+        this.inv = Bukkit.createInventory(null,size,name);
+        this.hubPlayer = HubExtended.getInstance().getHubPlayer(player.getUniqueId());
+
+        player.openInventory(this.inv);
+
+        for(int i = 0; i < this.inv.getSize();i++){
+            this.inv.setItem(i,utils.createItem("&c|",Material.STAINED_GLASS_PANE));
+        }
+
+
+        HubExtended.getInstance().getBungeeChannelApi().getPlayerCount("hub").whenComplete((result,error) -> {
+            hubOnline = result;
+        });
+
+        this.inv.setItem(10,utils.createNewItemWithMeta("&7Players online: &e"+hubOnline+"","&7Thank you &e"+player.getName()+" &7for playing!",Material.BOOKSHELF,"&a&lHub"));
+        HubExtended.getInstance().getBungeeChannelApi().getPlayerCount("survival").whenComplete((result,error) -> {
+            survivalOnline = result;
+        });
+        this.inv.setItem(11,utils.createNewItemWithMeta("&7Players online: &e"+survivalOnline+"","&7Version: &a1.16.1",Material.STICK,"&c&lSurvival"));
     }
 
     public void luckyChest(Player player){
@@ -159,6 +190,32 @@ public class Menu implements Listener {
         if(!(hbConfigSetup.getAllKillEffectsItems() == null)){
             for(int i = 0; i < hbConfigSetup.getKillEffectSize(); i++){
                 inv.setItem(i,hbConfigSetup.getAllKillEffectsItems().get(i));
+            }
+        }else {
+            return;
+        }
+    }
+
+    public void victoryDances(Player player){
+        this.inv = Bukkit.createInventory(null,36,"Victory Dances");
+        this.hubPlayer = HubExtended.getInstance().getHubPlayer(player.getUniqueId());
+
+        player.openInventory(inv);
+
+        inv.setItem(31,utils.createItem("&cBack",Material.BED));
+
+        inv.setItem(35,utils.createItem("&cNONE",Material.BARRIER));
+
+        for(int i = 0; i<9;i++){
+            this.inv.setItem(i,utils.createItem("&c&o&ksecret",Material.STAINED_GLASS_PANE));
+        }
+
+        HBConfigSetup hbConfigSetup = new HBConfigSetup(player);
+        inv.setItem(34,hbConfigSetup.getVictoryDanceItem(VictoryDances.valueOf(hbConfigSetup.get("player.victoryDanceInUse"))));
+
+        if(!(hbConfigSetup.getAllVictoryDanceItems() == null)){
+            for(int i = 0; i < hbConfigSetup.getVictoryDanceSize(); i++){
+                inv.setItem(i,hbConfigSetup.getAllVictoryDanceItems().get(i));
             }
         }else {
             return;

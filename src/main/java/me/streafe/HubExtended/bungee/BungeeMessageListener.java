@@ -28,10 +28,8 @@ public class BungeeMessageListener implements PluginMessageListener {
         ByteArrayDataInput in = ByteStreams.newDataInput(message);
         String subChannel = in.readUTF();
 
-        switch (subChannel){
-            case "Message":
-                break;
-
+        if(subChannel.equals("GetServer")){
+            String serverName = in.readUTF();
         }
 
     }
@@ -70,6 +68,10 @@ public class BungeeMessageListener implements PluginMessageListener {
 
     }
 
+    public void playerCount(String server){
+
+    }
+
     public void sendPlayerMessage(Player target, String message){
 
         try{
@@ -102,9 +104,9 @@ public class BungeeMessageListener implements PluginMessageListener {
         out.writeUTF(reason);
     }
 
-    public static String getServerName(Player player){
-        String text = "";
-        return text;
+    public String getServerName(){
+        return HubExtended.getInstance().getBungeeChannelApi().getServer().toString();
     }
+
 
 }

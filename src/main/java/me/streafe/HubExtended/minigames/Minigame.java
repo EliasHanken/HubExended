@@ -61,7 +61,6 @@ public class Minigame implements Listener {
 
 
     public void startGame(){
-
         for(HubPlayer players : getPlayerList()) {
             this.gameState = GameState.STARTED;
             players.setInGame(true);
@@ -122,6 +121,17 @@ public class Minigame implements Listener {
     }
 
     @EventHandler
+    public void damagePlayerKillEffect(PlayerDeathEvent ev){
+        if(ev.getEntity() != null){
+            GameAccessoriesHandler gah = new GameAccessoriesHandler(ev.getEntity().getKiller());
+            gah.playKillEffect(ev.getEntity().getLocation().add(0, 1, 0));
+
+        }
+
+
+    }
+
+    @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent e){
         if((HubExtended.getInstance().getMinigameByID(HubExtended.getInstance().getHubPlayer(e.getPlayer().getUniqueId()).getGameID()).minigameType == MinigameType.SKYWARS)){
             if(!(HubExtended.getInstance().getMinigameByID(HubExtended.getInstance().getHubPlayer(e.getPlayer().getUniqueId()).getGameID()).gameState == GameState.LOBBY)){
@@ -136,6 +146,7 @@ public class Minigame implements Listener {
     public void onPlayerShootProjectile(EntityDamageByEntityEvent e){
 
         if(e.getEntity() instanceof Monster || e.getEntity() instanceof Animals) return;
+        if(e.getEntity() instanceof NPC) return;
 
         if(HubExtended.getInstance().getMinigameByID( HubExtended.getInstance().getHubPlayer(e.getEntity().getUniqueId()).getGameID() ) == null)return;
 
@@ -220,6 +231,7 @@ public class Minigame implements Listener {
     @EventHandler
     public void onPlayerHurt(EntityDamageByEntityEvent e){
 
+
         /*
         if(!(e.getEntity() instanceof Player)){
             if(e.getCause() != EntityDamageEvent.DamageCause.PROJECTILE)return;
@@ -233,8 +245,14 @@ public class Minigame implements Listener {
             }
         }
          */
+        if(!e.getEntity().getWorld().getName().equalsIgnoreCase("world"))return;
+        if(!e.getDamager().getWorld().getName().equalsIgnoreCase("world"))return;
         if(e.getDamager() instanceof Player){
             HubPlayer hubPlayer = HubExtended.getInstance().getHubPlayer(e.getDamager().getUniqueId());
+            if(((Player) e.getDamager()).getPlayer().isOp()){
+                e.setCancelled(false);
+                return;
+            }
 
             if(!hubPlayer.inGame){
                 e.setCancelled(true);

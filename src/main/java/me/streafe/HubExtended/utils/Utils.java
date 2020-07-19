@@ -74,6 +74,22 @@ public class Utils {
         return itemStack;
     }
 
+    public ItemStack createNewItemWithMeta(String line1C, String line2C, Material material, String displayName){
+        ItemStack itemStack = new ItemStack(material);
+        ItemMeta meta = itemStack.getItemMeta();
+        List<String> list = new ArrayList<>();
+        list.add(this.translate(line1C));
+        list.add(this.translate(line2C));
+
+        meta.setDisplayName(this.translate(displayName));
+        meta.setLore(list);
+        meta.getItemFlags().add(ItemFlag.HIDE_ATTRIBUTES);
+
+        itemStack.setItemMeta(meta);
+
+        return itemStack;
+    }
+
     public String getPluginPrefix(){
         return translate(HubExtended.getInstance().getConfig().getString("system.plugin_prefix"));
     }

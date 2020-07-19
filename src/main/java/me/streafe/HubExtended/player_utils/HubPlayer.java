@@ -2,6 +2,7 @@ package me.streafe.HubExtended.player_utils;
 
 import me.streafe.HubExtended.HubExtended;
 import me.streafe.HubExtended.gameAccessories.KillEffects;
+import me.streafe.HubExtended.gameAccessories.VictoryDances;
 import me.streafe.HubExtended.minigames.Minigame;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -26,6 +27,7 @@ public class HubPlayer {
     public String inventory;
     public int gamePoints = 0;
     public KillEffects killEffect;
+    public VictoryDances victoryDances;
 
     public HubPlayer(Player player){
         this.player = player;

@@ -2,6 +2,7 @@ package me.streafe.HubExtended.player_utils;
 
 import me.streafe.HubExtended.HubExtended;
 import me.streafe.HubExtended.gameAccessories.KillEffects;
+import me.streafe.HubExtended.gameAccessories.VictoryDances;
 import me.streafe.HubExtended.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -78,9 +79,17 @@ public class HBConfigSetup {
             yaml.set("player.level",0.0);
             yaml.set("player.inventory", "");
             yaml.set("player.gameAccessories.killEffects","");
+            yaml.set("player.gameAccessories.victoryDances","");
             yaml.set("player.killEffectInUse","NONE");
+            yaml.set("player.victoryDanceInUse","NONE");
             if(hubPlayer.rank == RankEnum.MEMBER){
                 yaml.set("player.rank","MEMBER");
+            }if(hubPlayer.rank == RankEnum.VIP){
+                yaml.set("player.rank","VIP");
+            }if(hubPlayer.rank == RankEnum.ALIEN){
+                yaml.set("player.rank","ALIEN");
+            }if(hubPlayer.rank == RankEnum.ALIENPLUSS){
+                yaml.set("player.rank","ALIENPLUSS");
             }else if(hubPlayer.rank == RankEnum.MODERATOR){
                 yaml.set("player.rank","MODERATOR");
             }else if(hubPlayer.rank == RankEnum.CO_OWNER){
@@ -108,11 +117,16 @@ public class HBConfigSetup {
             hubPlayer.level = yaml.getDouble("player.level");
             hubPlayer.inventory = yaml.getString("player.inventory");
             hubPlayer.killEffect = KillEffects.valueOf(yaml.getString("player.killEffectInUse").toUpperCase());
+            hubPlayer.victoryDances = VictoryDances.valueOf(yaml.getString("player.victoryDanceInUse").toUpperCase());
 
             if(yaml.get("player.rank").equals("MEMBER")){
                 hubPlayer.setRank(RankEnum.MEMBER);
             }else if(yaml.get("player.rank").equals("VIP")){
                 hubPlayer.setRank(RankEnum.VIP);
+            }else if(yaml.get("player.rank").equals("ALIEN")){
+                hubPlayer.setRank(RankEnum.ALIEN);
+            }else if(yaml.get("player.rank").equals("ALIENPLUSS")){
+                hubPlayer.setRank(RankEnum.ALIENPLUSS);
             } else if(yaml.get("player.rank").equals("MODERATOR")){
                 hubPlayer.setRank(RankEnum.MODERATOR);
             }else if(yaml.get("player.rank").equals("ADMIN")){
@@ -260,8 +274,34 @@ public class HBConfigSetup {
 
     }
 
+    public List<ItemStack> getAllVictoryDanceItems(){
+        if(get("player.gameAccessories.victoryDances").equalsIgnoreCase("")){
+            return null;
+        }
+        List<ItemStack> effects = new ArrayList<>();
+
+        try{
+            String[] l = get("player.gameAccessories.victoryDances").split(":");
+
+            for(int i = 0; i < l.length;i++){
+                effects.add(getVictoryDanceItem(VictoryDances.valueOf(l[i].toUpperCase())));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return effects;
+
+    }
+
     public int getKillEffectSize(){
         String[] l = get("player.gameAccessories.killEffects").split(":");
+
+        return l.length;
+    }
+
+    public int getVictoryDanceSize(){
+        String[] l = get("player.gameAccessories.victoryDances").split(":");
 
         return l.length;
     }
@@ -279,6 +319,18 @@ public class HBConfigSetup {
             return utils.createItem("&6&lLEGENDARY &b&oFinal Smash",Material.ARMOR_STAND);
         }else if(killEffects == KillEffects.NONE){
             return utils.createItem("&7NONE", Material.GLASS);
+        }
+        return null;
+    }
+    public ItemStack getVictoryDanceItem(VictoryDances victoryDances){
+        if(victoryDances == VictoryDances.DRAGONRIDER){
+            return utils.createItem("&6&lLEGENDARY &5&oDragon Rider",Material.DRAGON_EGG);
+        }else if(victoryDances == VictoryDances.HORSERIDER){
+            return utils.createItem("&bCOMMON &7&oHorse Rider", Material.SADDLE);
+        }else if(victoryDances == VictoryDances.ZOMBIERIDER){
+            return utils.createItem("&d&lEPIC &7&oZombie Rider",Material.BONE);
+        }else if(victoryDances == VictoryDances.NONE){
+            return utils.createItem("&7NONE",Material.GLASS);
         }
         return null;
     }
