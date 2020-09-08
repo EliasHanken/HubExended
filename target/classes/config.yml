@@ -1,3 +1,6 @@
+duels:
+  spawn1:
+  spawn2:
 sql:
   #reloading plugin time increases by 4seconds
   enable: 'false'

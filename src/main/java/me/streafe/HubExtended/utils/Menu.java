@@ -85,7 +85,7 @@ public class Menu implements Listener {
         }
         rankItem.setItemMeta(rankMeta);
 
-        ItemStack gameSettings = utils.createNewItemWithMeta("","&7use this to acces the settings in game",Material.BOW,"&aGame Settings", Enchantment.ARROW_INFINITE);
+        ItemStack gameSettings = utils.createNewItemWithMeta("","&7use this to access the settings in game",Material.BOW,"&aGame Settings", Enchantment.ARROW_INFINITE);
 
         for (int i = 0; i<inv.getSize();i++){
             inv.setItem(i,utils.createItem("&c|",Material.STAINED_GLASS_PANE));
@@ -110,16 +110,15 @@ public class Menu implements Listener {
             this.inv.setItem(i,utils.createItem("&c|",Material.STAINED_GLASS_PANE));
         }
 
-
         HubExtended.getInstance().getBungeeChannelApi().getPlayerCount("hub").whenComplete((result,error) -> {
-            hubOnline = result;
+            this.inv.setItem(10,utils.createNewItemWithMeta("&7Players online: &e"+result+"","&7Thank you &e"+player.getName()+" &7for playing!",Material.BOOKSHELF,"&a&lHub"));
         });
 
-        this.inv.setItem(10,utils.createNewItemWithMeta("&7Players online: &e"+hubOnline+"","&7Thank you &e"+player.getName()+" &7for playing!",Material.BOOKSHELF,"&a&lHub"));
         HubExtended.getInstance().getBungeeChannelApi().getPlayerCount("survival").whenComplete((result,error) -> {
-            survivalOnline = result;
+            this.inv.setItem(11,utils.createNewItemWithMeta("&7Players online: &e"+result+"","&7Version: &a1.16.1",Material.STICK,"&c&lSurvival"));
         });
-        this.inv.setItem(11,utils.createNewItemWithMeta("&7Players online: &e"+survivalOnline+"","&7Version: &a1.16.1",Material.STICK,"&c&lSurvival"));
+
+
     }
 
     public void luckyChest(Player player){

@@ -253,14 +253,26 @@ public class AnimatedScoreboard {
                     ScoreboardScore s3 = new ScoreboardScore(board, obj, utils.translate("&fRank: " + prefix + RankEnum.valueOf(hbConfigSetup.get("player.rank")).getPrefix()));
                     ScoreboardScore s4 = new ScoreboardScore(board, obj, utils.translate("&fTokens: &a" + tokens + "✯"));
                     BungeeMessageListener bungeeMessageListener = new BungeeMessageListener();
-                    HubExtended.getInstance().getBungeeChannelApi().getPlayerCount("ALL").whenComplete((result,error) -> {
-                        online = result;
-                    });
-                    ScoreboardScore s5 = new ScoreboardScore(board, obj, utils.translate("&fOnline: &a" + online));
+                    try{
+                        HubExtended.getInstance().getBungeeChannelApi().getPlayerCount("ALL").whenComplete((result,error) -> {
+                            online = result;
+                        });
+                    }catch (Exception ignored){
+                    }
+                    ScoreboardScore s5;
+                    if(!(online == 0)){
+                        s5 = new ScoreboardScore(board, obj, utils.translate("&fOnline: &a" + online));
+                    }else{
+                        s5 = new ScoreboardScore(board, obj, utils.translate("&fOnline: &a" + 0));
+                    }
 
-                    HubExtended.getInstance().getBungeeChannelApi().getServer().whenComplete((result,error) -> {
-                        serverName = result;
-                    });
+                    try{
+                        HubExtended.getInstance().getBungeeChannelApi().getServer().whenComplete((result,error) -> {
+                            serverName = result;
+                        });
+                    }catch (Exception ignored){
+
+                    }
 
                     ScoreboardScore s6 = new ScoreboardScore(board, obj, utils.translate("&fServer: &a" + serverName));
                     ScoreboardScore s7 = new ScoreboardScore(board, obj, utils.translate("&fWins: &a" + hubPlayer.wins));

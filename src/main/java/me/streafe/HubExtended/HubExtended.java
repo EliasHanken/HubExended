@@ -11,10 +11,7 @@ import me.streafe.HubExtended.hub_commands.AllowedCommandsPerRank;
 import me.streafe.HubExtended.hub_commands.RankCommand;
 import me.streafe.HubExtended.hub_commands.lucky_chest_command;
 import me.streafe.HubExtended.hub_commands.menu_command;
-import me.streafe.HubExtended.hub_listeners.BlockListener;
-import me.streafe.HubExtended.hub_listeners.RespawnListener;
-import me.streafe.HubExtended.hub_listeners.JoinListener;
-import me.streafe.HubExtended.hub_listeners.SpeakListener;
+import me.streafe.HubExtended.hub_listeners.*;
 import me.streafe.HubExtended.minigames.Minigame;
 import me.streafe.HubExtended.minigames.MinigameCommand;
 import me.streafe.HubExtended.minigames.OITCCommand;
@@ -49,6 +46,8 @@ public class HubExtended extends JavaPlugin implements PluginMessageListener {
     private Scoreboard mainScoreboard;
     private String nmsVersion;
     private BungeeChannelApi bungeeChannelApi;
+    private List<DuelGame> duelGamesList;
+    private List<DuelGamePlayer> duelGamePlayersList;
 
     private Utils utils = new Utils();
 
@@ -89,8 +88,11 @@ public class HubExtended extends JavaPlugin implements PluginMessageListener {
         getCommand("sethub").setExecutor(new BungeeConnect());
         getCommand("setrank").setExecutor(new RankCommand());
         getCommand("ranklist").setExecutor(new RankCommand());
+        getCommand("duels").setExecutor(new DuelsCommand());
 
         this.mainScoreboard = this.getServer().getScoreboardManager().getNewScoreboard();
+
+        this.duelGamesList = new ArrayList<>();
 
 
 
@@ -111,6 +113,10 @@ public class HubExtended extends JavaPlugin implements PluginMessageListener {
         getServer().getPluginManager().registerEvents(new BlockListener(),this);
         getServer().getPluginManager().registerEvents(new SpeakListener(),this);
         getServer().getPluginManager().registerEvents(new Minigame(),this);
+        getServer().getPluginManager().registerEvents(new DuelSwordListener(),this);
+        getServer().getPluginManager().registerEvents(new DuelGame(),this);
+        getServer().getPluginManager().registerEvents(new ShopSignsListener(),this);
+
 
         getCommand("minigames").setExecutor(new MinigameCommand());
         getCommand("settings").setExecutor(new menu_command());
@@ -128,6 +134,7 @@ public class HubExtended extends JavaPlugin implements PluginMessageListener {
             this.sql_class = new SQL_Class(host,port,usr,pw,dbn);
             try {
                 sql_class.connect();
+                sql_class.createDefaulttables();
             } catch (SQLException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
@@ -162,6 +169,14 @@ public class HubExtended extends JavaPlugin implements PluginMessageListener {
          */
 
         this.bungeeChannelApi = BungeeChannelApi.of(this);
+        this.duelGamePlayersList = new ArrayList<>();
+
+        for(Player player : getServer().getOnlinePlayers()){
+            if(!duelGamePlayersList.contains(player)){
+                duelGamePlayersList.add(new DuelGamePlayer(player));
+            }
+
+        }
 
     }
 
@@ -232,5 +247,40 @@ public class HubExtended extends JavaPlugin implements PluginMessageListener {
 
     public BungeeChannelApi getBungeeChannelApi() {
         return bungeeChannelApi;
+    }
+
+    public List<DuelGame> getDuelGamesList() {
+        return duelGamesList;
+    }
+
+    public boolean duelGameHost(Player player){
+        for(DuelGame duelGame : getDuelGamesList()){
+            if(duelGame.host == player ){
+                return true;
+            }
+        }
+       return false;
+    }
+
+    public boolean duelGameOpponent(Player player){
+        for(DuelGame duelGame : getDuelGamesList()){
+            if(duelGame.opponent == player ){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public DuelGamePlayer getDuelGamePlayer(Player player){
+        for(DuelGamePlayer duelGamePlayer : duelGamePlayersList){
+            if(duelGamePlayer.player == player){
+                return duelGamePlayer;
+            }
+        }
+        return null;
+    }
+
+    public SQL_Class getSql_class(){
+        return this.sql_class;
     }
 }

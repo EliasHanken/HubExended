@@ -33,15 +33,35 @@ public class Utils {
     }
 
     public void sendTitle(Player player, int fadeIn, int duration, int fadeOut, String message){
-        IChatBaseComponent titleJson = new IChatBaseComponent.ChatSerializer().a("{\"text\":}" + translate(message)  +"\"}");
+        IChatBaseComponent titleJson = IChatBaseComponent.ChatSerializer.a("{\"text\":}" + translate(message)  +"\"}");
         PacketPlayOutTitle title = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE,titleJson,fadeIn,duration,fadeOut);
     }
 
     public void sendSubtitle(Player player, int fadeIn, int duration, int fadeOut, String message){
-        IChatBaseComponent titleJson = new IChatBaseComponent.ChatSerializer().a("{\"text\":}" + translate(message)  +"\"}");
+        IChatBaseComponent titleJson = IChatBaseComponent.ChatSerializer.a("{\"text\":}" + translate(message)  +"\"}");
         PacketPlayOutTitle title = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.SUBTITLE,titleJson,fadeIn,duration,fadeOut);
 
     }
+
+
+    public String saveLoc(Location loc) {
+        String location = loc.getWorld().getName() + ":" + loc.getX() + ":" + loc.getY() + ":" + loc.getZ();
+        return location;
+    }
+
+
+    public Location getLocation(String string) {
+        String[] l = string.split(":");
+        return new Location(Bukkit.getWorld(l[0]), Double.parseDouble(l[1]), Double.parseDouble(l[2]), Double.parseDouble(l[3]));
+    }
+
+    public void giveHubItems(Player player){
+        player.getInventory().setItem(1,getCustomTextureHead("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTRkNDliYWU5NWM3OTBjM2IxZmY1YjJmMDEwNTJhNzE0ZDYxODU0ODFkNWIxYzg1OTMwYjNmOTlkMjMyMTY3NCJ9fX0=","&cSettings"));
+        player.getInventory().setItem(0,createNewItemWithMeta("&7Compass to send you","&7to other servers!", Material.COMPASS,"&cServer Switcher"));
+        player.getInventory().setItem(2,createNewItemWithMeta("&7Duel other noobs","&7choose your opponent", Material.DIAMOND_SWORD,"&cDuel Player &a(Left-click)"));
+
+    }
+
 
     public void createItemStackFromConfig(){
 

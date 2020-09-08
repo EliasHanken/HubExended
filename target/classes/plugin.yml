@@ -5,6 +5,9 @@ author: Streafe
 api-version: 1.0
 
 commands:
+  duels:
+    usage: /<command>
+    default: true
   connect:
     usage: /<command>
     default: true

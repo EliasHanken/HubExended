@@ -10,14 +10,12 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 public class HBConfigSetup {
@@ -213,6 +211,16 @@ public class HBConfigSetup {
         }
     }
     public void editString(String string,int value){
+        YamlConfiguration yaml = YamlConfiguration.loadConfiguration(playerFile);
+        yaml.set(string,value);
+        try {
+            yaml.save(playerFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void editString(String string,double value){
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(playerFile);
         yaml.set(string,value);
         try {

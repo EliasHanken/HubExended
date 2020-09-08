@@ -16,6 +16,8 @@ public class MinigameHandler implements Listener {
     @EventHandler
     public void onPlayerHurt(EntityDamageByEntityEvent e){
 
+
+
         if(e.getEntity() instanceof Player){
             Player p = (Player) e.getEntity();
             HubPlayer hubPlayer = HubExtended.getInstance().getHubPlayer(p.getUniqueId());

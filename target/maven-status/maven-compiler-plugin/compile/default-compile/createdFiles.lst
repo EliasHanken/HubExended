@@ -3,6 +3,7 @@ me\streafe\HubExtended\gameAccessories\KillEffects.class
 me\streafe\HubExtended\hub_commands\lucky_chest_command.class
 me\streafe\HubExtended\minigames\MinigameType.class
 me\streafe\HubExtended\hub_listeners\BlockListener.class
+me\streafe\HubExtended\hub_listeners\DuelGame$2.class
 me\streafe\HubExtended\utils\MenuListener$1.class
 me\streafe\HubExtended\utils\ParticleEffect$ParticlePacket.class
 me\streafe\HubExtended\utils\FireworkUtil$1$1.class
@@ -13,6 +14,7 @@ me\streafe\HubExtended\utils\TextBuilder$ClickEventType.class
 me\streafe\HubExtended\gameAccessories\KillEffectsUtil.class
 me\streafe\HubExtended\utils\InstantFirework.class
 me\streafe\HubExtended\utils\AnimatedScoreboard.class
+me\streafe\HubExtended\hub_listeners\ShopEntities.class
 me\streafe\HubExtended\minigames\Kit.class
 me\streafe\HubExtended\utils\ParticleEffect$ParticlePacket$VersionIncompatibleException.class
 me\streafe\HubExtended\gameAccessories\VictoryDances.class
@@ -33,10 +35,13 @@ me\streafe\HubExtended\utils\MenuListener$10.class
 me\streafe\HubExtended\utils\MenuListener$6.class
 me\streafe\HubExtended\player_utils\PlayerRankUpdate.class
 me\streafe\HubExtended\utils\FireworkUtil$1.class
+me\streafe\HubExtended\hub_listeners\DuelGame$1.class
 me\streafe\HubExtended\hub_commands\menu_command.class
 me\streafe\HubExtended\utils\ParticleEffect$ParticleColorException.class
+me\streafe\HubExtended\hub_listeners\DuelGame.class
 me\streafe\HubExtended\utils\ParticleEffect$ParticlePacket$PacketSendingException.class
 me\streafe\HubExtended\player_utils\HBConfigSetup.class
+me\streafe\HubExtended\sql\PlayerSQLStats.class
 me\streafe\HubExtended\bungee\BungeeChannelApi$ForwardConsumer.class
 me\streafe\HubExtended\utils\CustomSign.class
 me\streafe\HubExtended\utils\ItemContent.class
@@ -55,6 +60,7 @@ me\streafe\HubExtended\gameAccessories\KillEffectFinalSmash.class
 me\streafe\HubExtended\player_utils\PlayerRankUpdate$1.class
 me\streafe\HubExtended\HubExtended.class
 me\streafe\HubExtended\bungee\BungeeMessage.class
+me\streafe\HubExtended\hub_listeners\DuelsCommand.class
 me\streafe\HubExtended\minigames\Minigame.class
 me\streafe\HubExtended\bungee\BungeeConnect$2$1.class
 me\streafe\HubExtended\utils\ParticleEffect$ParticlePacket$PacketInstantiationException.class
@@ -62,6 +68,7 @@ me\streafe\HubExtended\sql\SQL_Utils.class
 me\streafe\HubExtended\utils\FireworkUtil.class
 me\streafe\HubExtended\gameAccessories\DeathNoises.class
 me\streafe\HubExtended\gameAccessories\KillEffectHeadRocket.class
+me\streafe\HubExtended\hub_listeners\DuelGamePlayer.class
 me\streafe\HubExtended\utils\ParticleEffect$NoteColor.class
 me\streafe\HubExtended\utils\ReflectionUtils$PackageType.class
 me\streafe\HubExtended\utils\PacketUtils.class
@@ -72,6 +79,7 @@ me\streafe\HubExtended\minigames\MinigameCommand.class
 me\streafe\HubExtended\utils\ParticleEffect$ParticleDataException.class
 me\streafe\HubExtended\minigames\MinigameHandler.class
 me\streafe\HubExtended\gameAccessories\DragonRiderDance.class
+me\streafe\HubExtended\hub_listeners\DuelSwordListener.class
 me\streafe\HubExtended\utils\MenuListener$3.class
 me\streafe\HubExtended\utils\Utils.class
 me\streafe\HubExtended\hub_commands\CosmeticCommand.class
@@ -95,6 +103,7 @@ me\streafe\HubExtended\utils\MenuListener$2.class
 me\streafe\HubExtended\utils\ParticleEffect$ParticleData.class
 me\streafe\HubExtended\bungee\BungeeChannelApi.class
 me\streafe\HubExtended\utils\ParticleEffect$ParticleProperty.class
+me\streafe\HubExtended\hub_listeners\ShopSignsListener.class
 me\streafe\HubExtended\minigames\Minigame$1.class
 me\streafe\HubExtended\bungee\BungeeConnect$2.class
 me\streafe\HubExtended\hub_listeners\RespawnListener.class

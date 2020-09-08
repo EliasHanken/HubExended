@@ -2,6 +2,7 @@ package me.streafe.HubExtended.minigames;
 
 import me.streafe.HubExtended.HubExtended;
 import me.streafe.HubExtended.gameAccessories.GameAccessoriesHandler;
+import me.streafe.HubExtended.hub_listeners.DuelGame;
 import me.streafe.HubExtended.player_utils.HBConfigSetup;
 import me.streafe.HubExtended.player_utils.HubPlayer;
 import me.streafe.HubExtended.utils.FireworkUtil;
@@ -99,6 +100,7 @@ public class Minigame implements Listener {
     }
 
 
+    /*
     @EventHandler
     public void damage(PlayerDeathEvent ev){
         if(ev.getEntity() != null){
@@ -120,6 +122,9 @@ public class Minigame implements Listener {
 
     }
 
+     */
+
+    /*
     @EventHandler
     public void damagePlayerKillEffect(PlayerDeathEvent ev){
         if(ev.getEntity() != null){
@@ -131,6 +136,9 @@ public class Minigame implements Listener {
 
     }
 
+     */
+
+    /*
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent e){
         if((HubExtended.getInstance().getMinigameByID(HubExtended.getInstance().getHubPlayer(e.getPlayer().getUniqueId()).getGameID()).minigameType == MinigameType.SKYWARS)){
@@ -142,6 +150,8 @@ public class Minigame implements Listener {
         }
     }
 
+     */
+
     @EventHandler
     public void onPlayerShootProjectile(EntityDamageByEntityEvent e){
 
@@ -149,7 +159,6 @@ public class Minigame implements Listener {
         if(e.getEntity() instanceof NPC) return;
 
         if(HubExtended.getInstance().getMinigameByID( HubExtended.getInstance().getHubPlayer(e.getEntity().getUniqueId()).getGameID() ) == null)return;
-
 
 
         if((HubExtended.getInstance().getMinigameByID(HubExtended.getInstance().getHubPlayer(e.getEntity().getUniqueId()).getGameID()).minigameType == MinigameType.OITC)){
@@ -254,11 +263,27 @@ public class Minigame implements Listener {
                 return;
             }
 
-            if(!hubPlayer.inGame){
-                e.setCancelled(true);
-                hubPlayer.sendMessage(utils.translate("&c(!) &7no pvp!"));
-                return;
+            for(DuelGame duelGame : HubExtended.getInstance().getDuelGamesList()){
+                if(!(duelGame.opponent == e.getDamager() || duelGame.host == e.getDamager())){
+                    e.setCancelled(true);
+                }else{
+                    e.setCancelled(false);
+                    return;
+                }
             }
+
+            if(!hubPlayer.inGame){
+                for(DuelGame duelGame : HubExtended.getInstance().getDuelGamesList()){
+                    if(!(duelGame.opponent == e.getDamager() || duelGame.host == e.getDamager())){
+                        e.setCancelled(true);
+                        hubPlayer.sendMessage(utils.translate("&c(!) &7no pvp!"));
+                        return;
+                    }
+                }
+            }
+
+
+
 
             if(hubPlayer.inGame){
                 if(HubExtended.getInstance().getMinigameByID(hubPlayer.getGameID()).gameState == GameState.STARTED){

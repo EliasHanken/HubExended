@@ -18,7 +18,7 @@ public class HubPlayer {
     public String gameID;
     public boolean signEditEnable = false;
     public boolean superVanish = false;
-    public int tokens;
+    public double tokens;
     public boolean isOnCooldown = false;
     public RankEnum rank = RankEnum.MEMBER;
     public List<String> friends;
@@ -71,7 +71,7 @@ public class HubPlayer {
         this.signEditEnable = bool;
     }
 
-    public int getTokens(){
+    public double getTokens(){
         return this.tokens;
     }
 

@@ -39,7 +39,7 @@ public class JoinListener implements Listener {
         hbConfigSetup.setHubPlayer();
 
         e.setJoinMessage("");
-        Bukkit.getServer().broadcastMessage((utils.translate(HubExtended.getInstance().getConfig().getString("system.join_message")) + RankEnum.valueOf(hbConfigSetup.get("player.rank")).getPrefix() + " " + p.getName()));
+        // Bukkit.getServer().broadcastMessage((utils.translate(HubExtended.getInstance().getConfig().getString("system.join_message")) + RankEnum.valueOf(hbConfigSetup.get("player.rank")).getPrefix() + " " + p.getName()));
 
         UpdatePlayerRun updatePlayerRun = new UpdatePlayerRun();
 
@@ -59,7 +59,7 @@ public class JoinListener implements Listener {
         p.getInventory().setItem(0,utils.createNewItemWithMeta("&7Compass to send you","&7to other servers!", Material.COMPASS,"&cServer Switcher"));
         p.getInventory().setItem(2,utils.createNewItemWithMeta("&7Duel other noobs","&7choose your opponent", Material.DIAMOND_SWORD,"&cDuel Player &a(Left-click)"));
 
-
+        HubExtended.getInstance().getSql_class().insertNewPlayerToSQL(p);
     }
 
     public static void updateOnlinePlayers(Player p){
